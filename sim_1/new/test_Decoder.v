@@ -20,10 +20,10 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module test_CondLogic(
+module test_Decoder(
 
     );
-        reg [3:0] Rd;
+    reg [3:0] Rd;
     reg [1:0] Op;
     reg [5:0] Funct;
     wire PCS;
@@ -38,7 +38,7 @@ module test_CondLogic(
     wire  [1:0] FlagW;
     
     
-  Decoder dut (Rd, Op, Funct, PCS, RegW, MemW, MemtoReg, ALUSrc, ImmSrc, RegSrc, NoWrite, ALUControl, FlagW);
+  Decoder dut(Rd, Op, Funct, PCS, RegW, MemW, MemtoReg, ALUSrc, ImmSrc, RegSrc, NoWrite, ALUControl, FlagW);
     
 
         initial begin
@@ -51,6 +51,10 @@ module test_CondLogic(
         #50;
         // Sub Reg
         Rd = 4'b0011; Op = 2'b00; Funct = 6'b000100;
+        // CMP Reg
+        Rd = 4'b0100; Op = 2'b00; Funct = 6'b010101;
+        // CMN Imm
+        Rd = 4'b0101; Op = 2'b00; Funct = 6'b110111;
         end
         
  
