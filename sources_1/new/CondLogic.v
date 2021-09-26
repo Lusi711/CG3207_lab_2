@@ -80,13 +80,13 @@ module CondLogic(
     begin
         if ((FlagW[1] & CondEx) == 1)
         begin
-            N <= 1;
-            Z <= 1;
+            N <= ALUFlags[3];
+            Z <= ALUFlags[2];
         end
         if ((FlagW[0] & CondEx) == 1)
         begin
-            C <= 1;
-            V <= 1;
+            C <= ALUFlags[1];
+            V <= ALUFlags[0];
         end
     end
     
