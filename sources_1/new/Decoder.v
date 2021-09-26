@@ -49,7 +49,47 @@ module Decoder(
     );
     
     wire ALUOp ;
-    reg [9:0] controls ;
-    //<extra signals, if any>
+    reg [9:0] controls; 
     
+    
+    //chapter 3 slides 42: updates RegSrc[1:0], ImmSrc[1:0], ALUSrc, MemtoReg, RegW, MemW, Branch, ALUOp (in that order)
+    always @(*) begin
+      case(Op)
+         2'b00: if (Funct[5]) controls = 10'b0000101001; // DP Imm
+         else controls = 10'b0000001001; // DP Reg
+         2'b01: if (Funct[0]) controls = 10'b0001111000;  // LDR  
+         else controls = 10'b1001110100;  // STR
+         2'b10: controls = 10'b0110100010;   // B
+         default: controls = 10'bx;
+      endcase
+    
+    
+    //chapter 3 slides 42: updates ALUControl[1:0] and FlagW[1:0]
+    if (ALUOp) begin
+        case(Funct[4:1])
+         4'b0100: begin ALUControl = 2'b00; if (Funct[0]) begin FlagW = 2'b11; end else 
+         begin FlagW = 2'b00; end 
+         end// ADD
+         
+         4'b0010: begin ALUControl = 2'b01; if (Funct[0]) begin FlagW = 2'b11; end else 
+         begin FlagW = 2'b00; end 
+         end // SUB
+         
+         4'b0000: begin ALUControl = 2'b10; if (Funct[0]) begin FlagW = 2'b10; end else 
+         begin FlagW = 2'b00; end 
+         end// AND
+         
+         4'b1100: begin ALUControl = 2'b11; if (Funct[0]) begin FlagW = 2'b10; end else 
+         begin FlagW = 2'b00; end 
+         end // ORR
+         
+         default: begin ALUControl = 2'bx; FlagW = 2'b00; end // unimplemented (eg ALUOp = 0)
+         endcase
+
+    end
+    
+    
+    
+    
+    end 
 endmodule
