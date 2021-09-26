@@ -146,9 +146,14 @@ module ARM(
     assign R15 = PCPlus8;
     assign WriteData = RD2;
     
+    // Shifter Logic
+    assign ShIn = RD2;
+    assign Shamt5 = Instr[11:7];
+    assign Sh = Instr[6:5];
+    
     // ALU Logic
     assign Src_A = RD1;
-    assign Src_B = (ALUSrc == 1) ? ExtImm : RD2;
+    assign Src_B = (ALUSrc == 1) ? ExtImm : ShOut;
     
     // Instantiate RegFile
     RegFile RegFile1( 
