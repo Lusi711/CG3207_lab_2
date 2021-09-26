@@ -36,7 +36,7 @@ module Decoder(
     input [3:0] Rd,
     input [1:0] Op,
     input [5:0] Funct,
-    output PCS,
+    output reg PCS,
     output RegW,
     output MemW,
     output MemtoReg,
@@ -48,18 +48,19 @@ module Decoder(
     output reg [1:0] FlagW
     );
     
-    wire ALUOp ;
+    wire ALUOp, Branch ;
     reg [9:0] controls; 
     
-    
+      assign {Branch,MemtoReg, MemW, ALUSrc, ImmSrc, RegW, RegSrc, ALUOp} = controls;
+ 
     //chapter 3 slides 42: updates RegSrc[1:0], ImmSrc[1:0], ALUSrc, MemtoReg, RegW, MemW, Branch, ALUOp (in that order)
     always @(*) begin
       case(Op)
-         2'b00: if (Funct[5]) controls = 10'b0000101001; // DP Imm
+         2'b00: if (Funct[5]) controls = 10'b0001001001; // DP Imm
          else controls = 10'b0000001001; // DP Reg
-         2'b01: if (Funct[0]) controls = 10'b0001111000;  // LDR  
-         else controls = 10'b1001110100;  // STR
-         2'b10: controls = 10'b0110100010;   // B
+         2'b01: if (Funct[0]) controls = 10'b0101011000;  // LDR  
+         else controls = 10'b0011010100;  // STR
+         2'b10: controls = 10'b1001100010;   // B
          default: controls = 10'bx;
       endcase
     
@@ -85,11 +86,13 @@ module Decoder(
          
          default: begin ALUControl = 2'bx; FlagW = 2'b00; end // unimplemented (eg ALUOp = 0)
          endcase
-
     end
     
     
+    assign PCS = ((Rd == 4'b1111) & RegW) | Branch; 
     
+  
+
     
     end 
 endmodule
