@@ -113,5 +113,5 @@ module Decoder(
             FlagW = 2'b00;
             NoWrite = 1'b0;
         end
-    end 
+    end
 endmodule
