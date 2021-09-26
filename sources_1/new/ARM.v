@@ -144,6 +144,7 @@ module ARM(
     assign Result = (MemtoReg == 1) ? ReadData : ALUResult;
     assign WD3 = Result;
     assign R15 = PCPlus8;
+    assign WriteData = RD2;
     
     // ALU Logic
     assign Src_A = RD1;
