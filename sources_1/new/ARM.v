@@ -118,9 +118,36 @@ module ARM(
     wire [31:0] Result ;
     
     // datapath connections here
+    
+    // CondLogic Logic
+    assign Cond = Instr[31:28];
+    
+    // Decoder Logic
+    assign Op = Instr[27:26];
+    assign Funct = Instr[25:20];
+    assign Rd = Instr[15:12];
+    
+    //Extender Logic
+    assign InstrImm = Instr[23:0];
+    
+    // Programme Counter Logic
+    assign PCPlus4 = PC + 32'b100;
+    assign PCPlus8 = PC + 32'b1000;
+    assign PC_IN = (PCSrc == 1) ? Result : PCPlus4;    
     assign WE_PC = 1 ; // Will need to control it for multi-cycle operations (Multiplication, Division) and/or Pipelining with hazard hardware.
 
-
+    // Register File Logic
+    assign WE3 = RegWrite;
+    assign A1 = (RegSrc[0] == 1) ? 4'b1111 : Instr[19:16];
+    assign A2 = (RegSrc[1] == 1) ? Instr[15:12] : Instr[3:0];
+    assign A3 = Instr[15:12];
+    assign Result = (MemtoReg == 1) ? ReadData : ALUResult;
+    assign WD3 = Result;
+    assign R15 = PCPlus8;
+    
+    // ALU Logic
+    assign Src_A = RD1;
+    assign Src_B = (ALUSrc == 1) ? ExtImm : RD2;
     
     // Instantiate RegFile
     RegFile RegFile1( 
@@ -200,3 +227,11 @@ module ARM(
                     PC  
                 );                             
 endmodule
+
+
+
+
+
+
+
+
