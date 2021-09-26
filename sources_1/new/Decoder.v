@@ -52,7 +52,7 @@ module Decoder(
     wire Branch;
     reg [9:0] controls ; // Branch, MemtoReg, MemW, ALUSrc, ImmSrc[1:0], RegW, RegSrc[1:0], ALUOp;
     //<extra signals, if any>
-    assign {Branch, MemtoReg, MemW, ALUSrc, ImmSrc, RegW, RegSrc, ALUOp} = controls[0];
+    assign {Branch, MemtoReg, MemW, ALUSrc, ImmSrc, RegW, RegSrc, ALUOp} = controls;
     // Main Decoder
     always @(*)
     begin
