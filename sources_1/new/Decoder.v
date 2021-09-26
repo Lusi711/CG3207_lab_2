@@ -86,6 +86,9 @@ module Decoder(
          
          4'b1010: begin ALUControl = 2'b01; if (Funct[0]) begin FlagW = 2'b11; NoWrite = 1'b1; end 
          end // CMP
+
+         4'b1011: begin ALUControl = 2'b00; if (Funct[0]) begin FlagW = 2'b11; NoWrite = 1'b1; end 
+         end // CMN
          
          default: begin ALUControl = 2'bx; FlagW = 2'b00; NoWrite = 1'b0; end // unimplemented (eg ALUOp = 0)
          endcase
