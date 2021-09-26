@@ -43,7 +43,7 @@ module Decoder(
     output ALUSrc,
     output [1:0] ImmSrc,
     output [1:0] RegSrc,
-    output reg NoWrite,
+    output NoWrite,
     output reg [1:0] ALUControl,
     output reg [1:0] FlagW
     );
@@ -53,7 +53,8 @@ module Decoder(
     
     assign {Branch,MemtoReg, MemW, ALUSrc, ImmSrc, RegW, RegSrc, ALUOp} = controls;
     assign PCS = ((Rd == 4'b1111) & RegW) | Branch;
- 
+    assign NoWrite = (Funct[4:0] == 5'b10101) | (Funct[4:0] == 5'b10111);
+    
     //chapter 3 slides 42: updates RegSrc[1:0], ImmSrc[1:0], ALUSrc, MemtoReg, RegW, MemW, Branch, ALUOp (in that order)
     always @(*) begin
       case(Op)
@@ -70,48 +71,40 @@ module Decoder(
             4'b0100: begin 
                 ALUControl = 2'b00;
                 FlagW = (Funct[0]) ? 2'b11 : 2'b00;
-                NoWrite = 1'b0;
             end
             // SUB
             4'b0010: begin
                 ALUControl = 2'b01;
                 FlagW = (Funct[0]) ? 2'b11 : 2'b00;
-                NoWrite = 1'b0;
             end
             // AND
             4'b0000: begin 
                 ALUControl = 2'b10; 
                 FlagW = (Funct[0]) ? 2'b10 : 2'b00;
-                NoWrite = 1'b0;
             end
             // ORR
             4'b1100: begin 
                 ALUControl = 2'b11; 
-                FlagW = (Funct[0]) ? 2'b10 : 2'b00; 
-                NoWrite = 1'b0;
+                FlagW = (Funct[0]) ? 2'b10 : 2'b00;
             end
             // CMP
             4'b1010: begin 
                 ALUControl = 2'b01;
-                FlagW = 2'b11; 
-                NoWrite = 1'b1;
+                FlagW = 2'b11;
             end
             // CMN
             4'b1011: begin 
                 ALUControl = 2'b00;
-                FlagW = 2'b11; 
-                NoWrite = 1'b1; 
+                FlagW = 2'b11;
             end
             default: begin
                 ALUControl = 2'b00; 
-                FlagW = 2'b00; 
-                NoWrite = 1'b0;
+                FlagW = 2'b00;
             end
          endcase
         end else begin
             ALUControl = 2'b00;
             FlagW = 2'b00;
-            NoWrite = 1'b0;
         end
     end
 endmodule

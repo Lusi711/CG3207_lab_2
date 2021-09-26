@@ -39,8 +39,7 @@ module test_Wrapper #(
 	Wrapper dut(DIP, PB, LED_OUT, LED_PC, SEVENSEGHEX, CONSOLE_OUT, CONSOLE_OUT_ready, CONSOLE_OUT_valid, CONSOLE_IN, CONSOLE_IN_valid, CONSOLE_IN_ack, RESET, CLK_undiv) ;
 	
 	// STIMULI
-    initial
-    begin
+    initial begin
 		RESET = 1; #10; RESET = 0; //hold reset state for 10 ns.
 		CONSOLE_OUT_ready = 1'h1; // ok to keep it high continously in the testbench. In reality, it will be high only if UART is ready to send a data to PC
         CONSOLE_IN = 8'h50;// 'P'. Will be read and ignored by the processor
