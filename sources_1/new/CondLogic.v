@@ -49,25 +49,6 @@ module CondLogic(
     reg CondEx ;
     reg N = 0, Z = 0, C = 0, V = 0 ;
     //<extra signals, if any>
-    wire [1:0] FlagWrite;
-    
-    assign FlagWrite[0] = FlagW[0] & CondEx;
-    assign FlagWrite[1] = FlagW[1] & CondEx;
-    // Set values of N, Z, C, V flags when required
-    always @ (posedge CLK)
-    begin
-        if (FlagWrite[1])
-        begin
-            N <= ALUFlags[3];
-            Z <= ALUFlags[2];
-        end
-        
-        if (FlagWrite[0])
-        begin
-            C <= ALUFlags[1];
-            V <= ALUFlags[0];
-        end
-    end
     
     always@(Cond, N, Z, C, V)
     begin
@@ -94,10 +75,35 @@ module CondLogic(
         endcase   
     end
     
-    // Assign write controls (combinational logic)
-    assign PCSrc = PCS & CondEx;
-    assign RegWrite = RegW & ~NoWrite & CondEx;
-    assign MemWrite = MemW & CondEx;
-        
-
+    // Set flags
+    always @(posedge CLK)
+    begin
+        if ((FlagW[1] & CondEx) == 1)
+        begin
+            N <= 1;
+            Z <= 1;
+        end
+        if ((FlagW[0] & CondEx) == 1)
+        begin
+            C <= 1;
+            V <= 1;
+        end
+    end
+    
+    assign PCSrc = (PCS & CondEx);
+    assign RegWrite = (RegW & CondEx & (~NoWrite));
+    assign MemWrite = (MemW & CondEx);
 endmodule
+
+
+
+
+
+
+
+
+
+
+
+
+

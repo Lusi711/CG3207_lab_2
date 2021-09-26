@@ -48,8 +48,77 @@ module Decoder(
     output reg [1:0] FlagW
     );
     
-    wire ALUOp ;
-    reg [9:0] controls ;
+    wire ALUOp;
+    wire Branch;
+    reg [9:0] controls ; // Branch, MemtoReg, MemW, ALUSrc, ImmSrc[1:0], RegW, RegSrc[1:0], ALUOp;
     //<extra signals, if any>
+    assign {Branch, MemtoReg, MemW, ALUSrc, ImmSrc, RegW, RegSrc, ALUOp} = controls[0];
+    // Main Decoder
+    always @(*)
+    begin
+        case (Op)
+            2'b00:
+                controls = (Funct[5] == 1) ? 10'b0001001X01 : 10'b0000XX1001; // Dp Imm or Dp Reg
+            2'b01:
+                controls = (Funct[0] == 1) ? 10'b0101011X00 : 10'b0X11010100; // LDR or STR
+            2'b10:
+                controls = 10'b1001100X10; // Branch
+            default:
+                controls = 10'bX;
+        endcase
+    end
+    
+    // ALU Decoder
+    always @(*)
+    begin
+        if (ALUOp == 0)
+        begin
+            ALUControl = 2'b00;
+            FlagW = 2'b00;
+        end
+        else
+        begin
+            case (Funct[4:1])
+                4'b0100: // Add
+                begin
+                    ALUControl = 2'b00;
+                    FlagW = (Funct[0] == 1) ? 2'b11 : 2'b00;
+                end 
+                4'b0010: // Sub
+                begin
+                    ALUControl = 2'b01;
+                    FlagW = (Funct[0] == 1) ? 2'b11 : 2'b00;
+                end
+                4'b0000: // And
+                begin
+                    ALUControl = 2'b10;
+                    FlagW = (Funct[0] == 1) ? 2'b10 : 2'b00;
+                end
+                4'b1100: // Orr
+                begin
+                    ALUControl = 2'b11;
+                    FlagW = (Funct[0] == 1) ? 2'b10 : 2'b00;
+                end
+                4'b1010: // Cmp
+                begin
+                    ALUControl = 2'b01;
+                    FlagW = 2'b11;
+                end
+                default:
+                begin
+                    ALUControl = 2'bXX;
+                    FlagW = 2'b00;
+                end
+            endcase
+        end
+    end
+    assign NoWrite = (Funct[4:1] == 4'b1010) ? 1 : 0;
+    // PC Logic
+    assign PCS = ((Rd == 4'b1111) & RegW) | Branch;
     
 endmodule
+
+
+
+
+
