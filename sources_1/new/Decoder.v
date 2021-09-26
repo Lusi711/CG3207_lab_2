@@ -43,62 +43,82 @@ module Decoder(
     output ALUSrc,
     output [1:0] ImmSrc,
     output [1:0] RegSrc,
-    output reg NoWrite,
+    output NoWrite,
     output reg [1:0] ALUControl,
     output reg [1:0] FlagW
     );
     
-    wire ALUOp, Branch ;
-    reg [9:0] controls; 
-    
-     assign {Branch,MemtoReg, MemW, ALUSrc, ImmSrc, RegW, RegSrc, ALUOp} = controls;
-     assign PCS = ((Rd == 4'b1111) & RegW) | Branch; 
- 
-    //chapter 3 slides 42: updates RegSrc[1:0], ImmSrc[1:0], ALUSrc, MemtoReg, RegW, MemW, Branch, ALUOp (in that order)
-    always @(*) begin
-      case(Op)
-         2'b00: if (Funct[5]) controls = 10'b0001001001; // DP Imm
-         else controls = 10'b0000001001; // DP Reg
-         2'b01: if (Funct[0]) controls = 10'b0101011000;  // LDR  
-         else begin controls = 10'b0011010100; end // STR
-         2'b10: controls = 10'b1001100010;   // B
-         default: controls = 10'b0000000000;
-      endcase
-    
-    
-    //chapter 3 slides 42: updates ALUControl[1:0] and FlagW[1:0]
-    if (ALUOp) begin
-        case(Funct[4:1])
-         4'b0100: begin ALUControl = 2'b00; if (Funct[0]) begin FlagW = 2'b11; NoWrite = 1'b0; end else 
-         begin FlagW = 2'b00; NoWrite = 1'b0;  end 
-         end// ADD
-         
-         4'b0010: begin ALUControl = 2'b01; if (Funct[0]) begin FlagW = 2'b11; NoWrite = 1'b0; end else 
-         begin FlagW = 2'b00;NoWrite = 1'b0;  end 
-         end // SUB
-         
-         4'b0000: begin ALUControl = 2'b10; if (Funct[0]) begin FlagW = 2'b10; NoWrite = 1'b0; end else 
-         begin FlagW = 2'b00;NoWrite = 1'b0;  end 
-         end// AND
-         
-         4'b1100: begin ALUControl = 2'b11; if (Funct[0]) begin FlagW = 2'b10; NoWrite = 1'b0; end else 
-         begin FlagW = 2'b00; NoWrite = 1'b0; end 
-         end // ORR
-         
-         4'b1010: begin ALUControl = 2'b01; if (Funct[0]) begin FlagW = 2'b11; NoWrite = 1'b1; end 
-         end // CMP
-         
-          4'b1011: begin ALUControl = 2'b01; if (Funct[0]) begin FlagW = 2'b11; NoWrite = 1'b1; end 
-         end // CMN
-         
-         default: begin ALUControl = 2'b00; FlagW = 2'b00; NoWrite = 1'b0; end // unimplemented (eg ALUOp = 0)
-         endcase
+    wire ALUOp;
+    wire Branch;
+    reg [9:0] controls ; // Branch, MemtoReg, MemW, ALUSrc, ImmSrc[1:0], RegW, RegSrc[1:0], ALUOp;
+    //<extra signals, if any>
+    assign {Branch, MemtoReg, MemW, ALUSrc, ImmSrc, RegW, RegSrc, ALUOp} = controls;
+    // Main Decoder
+    always @(*)
+    begin
+        case (Op)
+            2'b00:
+                controls = (Funct[5] == 1) ? 10'b0001001X01 : 10'b0000XX1001; // Dp Imm or Dp Reg
+            2'b01:
+                controls = (Funct[0] == 1) ? 10'b0101011X00 : 10'b0X11010100; // LDR or STR
+            2'b10:
+                controls = 10'b1001100X10; // Branch
+            default:
+                controls = 10'bX;
+        endcase
     end
     
+    // ALU Decoder
+    always @(*)
+    begin
+        if (ALUOp == 0)
+        begin
+            ALUControl = 2'b00;
+            FlagW = 2'b00;
+        end
+        else
+        begin
+            case (Funct[4:1])
+                4'b0100: // Add
+                begin
+                    ALUControl = 2'b00;
+                    FlagW = (Funct[0] == 1) ? 2'b11 : 2'b00;
+                end 
+                4'b0010: // Sub
+                begin
+                    ALUControl = 2'b01;
+                    FlagW = (Funct[0] == 1) ? 2'b11 : 2'b00;
+                end
+                4'b0000: // And
+                begin
+                    ALUControl = 2'b10;
+                    FlagW = (Funct[0] == 1) ? 2'b10 : 2'b00;
+                end
+                4'b1100: // Orr
+                begin
+                    ALUControl = 2'b11;
+                    FlagW = (Funct[0] == 1) ? 2'b10 : 2'b00;
+                end
+                4'b1010: // Cmp
+                begin
+                    ALUControl = 2'b01;
+                    FlagW = 2'b11;
+                end
+                4'b1011: // Cmn
+                begin
+                    ALUControl = 2'b00;
+                    FlagW = 2'b11;
+                end
+                default:
+                begin
+                    ALUControl = 2'bXX;
+                    FlagW = 2'b00;
+                end
+            endcase
+        end
+    end
+    assign NoWrite = (Funct[4:1] == (4'b1010 | 4'b1011)) ? 1 : 0;
+    // PC Logic
+    assign PCS = ((Rd == 4'b1111) & RegW) | Branch;
     
-    //assign PCS = ((Rd == 4'b1111) & RegW) | Branch; 
-      
-
-    
-    end  
 endmodule
