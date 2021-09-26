@@ -33,10 +33,10 @@
 */
 
 module Decoder(
-     input [3:0] Rd,
+    input [3:0] Rd,
     input [1:0] Op,
     input [5:0] Funct,
-    output reg PCS,
+    output PCS,
     output RegW,
     output MemW,
     output MemtoReg,
@@ -51,7 +51,8 @@ module Decoder(
     wire ALUOp, Branch ;
     reg [9:0] controls; 
     
-      assign {Branch,MemtoReg, MemW, ALUSrc, ImmSrc, RegW, RegSrc, ALUOp} = controls;
+     assign {Branch,MemtoReg, MemW, ALUSrc, ImmSrc, RegW, RegSrc, ALUOp} = controls;
+     assign PCS = ((Rd == 4'b1111) & RegW) | Branch; 
  
     //chapter 3 slides 42: updates RegSrc[1:0], ImmSrc[1:0], ALUSrc, MemtoReg, RegW, MemW, Branch, ALUOp (in that order)
     always @(*) begin
@@ -59,9 +60,9 @@ module Decoder(
          2'b00: if (Funct[5]) controls = 10'b0001001001; // DP Imm
          else controls = 10'b0000001001; // DP Reg
          2'b01: if (Funct[0]) controls = 10'b0101011000;  // LDR  
-         else controls = 10'b0011010100;  // STR
+         else begin controls = 10'b0011010100; end // STR
          2'b10: controls = 10'b1001100010;   // B
-         default: controls = 10'bx;
+         default: controls = 10'b0000000000;
       endcase
     
     
@@ -86,18 +87,18 @@ module Decoder(
          
          4'b1010: begin ALUControl = 2'b01; if (Funct[0]) begin FlagW = 2'b11; NoWrite = 1'b1; end 
          end // CMP
-
-         4'b1011: begin ALUControl = 2'b00; if (Funct[0]) begin FlagW = 2'b11; NoWrite = 1'b1; end 
+         
+          4'b1011: begin ALUControl = 2'b01; if (Funct[0]) begin FlagW = 2'b11; NoWrite = 1'b1; end 
          end // CMN
          
-         default: begin ALUControl = 2'bx; FlagW = 2'b00; NoWrite = 1'b0; end // unimplemented (eg ALUOp = 0)
+         default: begin ALUControl = 2'b00; FlagW = 2'b00; NoWrite = 1'b0; end // unimplemented (eg ALUOp = 0)
          endcase
     end
     
     
-    assign PCS = ((Rd == 4'b1111) & RegW) | Branch; 
-    
+    //assign PCS = ((Rd == 4'b1111) & RegW) | Branch; 
+      
 
     
-    end 
+    end  
 endmodule
