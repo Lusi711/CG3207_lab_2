@@ -132,7 +132,7 @@ module ARM(
     
     // Programme Counter Logic
     assign PCPlus4 = PC + 32'b100;
-    assign PCPlus8 = PC + 32'b1000;
+    assign PCPlus8 = PCPlus4 + 32'b100;
     assign PC_IN = (PCSrc == 1) ? Result : PCPlus4;    
     assign WE_PC = 1 ; // Will need to control it for multi-cycle operations (Multiplication, Division) and/or Pipelining with hazard hardware.
 
@@ -146,9 +146,14 @@ module ARM(
     assign R15 = PCPlus8;
     assign WriteData = RD2;
     
+    // Shifter Logic
+    assign ShIn = RD2;
+    assign Shamt5 = Instr[11:7];
+    assign Sh = Instr[6:5];
+    
     // ALU Logic
     assign Src_A = RD1;
-    assign Src_B = (ALUSrc == 1) ? ExtImm : RD2;
+    assign Src_B = (ALUSrc == 1) ? ExtImm : ShOut;
     
     // Instantiate RegFile
     RegFile RegFile1( 
@@ -228,11 +233,4 @@ module ARM(
                     PC  
                 );                             
 endmodule
-
-
-
-
-
-
-
 
