@@ -41,6 +41,7 @@ module test_Wrapper #(
 	// STIMULI
     initial begin
 		RESET = 1; #10; RESET = 0; //hold reset state for 10 ns.
+		/*
 		CONSOLE_OUT_ready = 1'h1; // ok to keep it high continously in the testbench. In reality, it will be high only if UART is ready to send a data to PC
         CONSOLE_IN = 8'h50;// 'P'. Will be read and ignored by the processor
         CONSOLE_IN_valid = 1'h1;
@@ -60,6 +61,26 @@ module test_Wrapper #(
         wait(~CONSOLE_IN_ack);
         CONSOLE_IN_valid = 1'h0;
 		//insert rest of the stimuli here
+		*/
+		// AND
+		DIP = 16'h0; PB = 3'h0; #150;
+        DIP = 16'h0; PB = 3'h2; #60;
+        DIP = 16'h6EE6; PB = 3'h0; #60;
+        DIP = 16'h0; PB = 3'h1; #60;
+        DIP = 16'hA526; PB = 3'h0; #100;
+        // ORR
+        DIP = 16'h0; PB = 3'h0; #70;
+        DIP = 16'h0; PB = 3'h2; #60;
+        DIP = 16'h6EE6; PB = 3'h0; #60;
+        DIP = 16'h0; PB = 3'h2; #60;
+        DIP = 16'hA526; PB = 3'h0; #100;
+        // ADD with shamt
+        DIP = 16'h0; PB = 3'h0; #70;
+        DIP = 16'h0; PB = 3'h2; #60;
+        DIP = 16'h6EE6; PB = 3'h0; #60;
+        DIP = 16'h0; PB = 3'h4; #60;
+        DIP = 16'hA526; PB = 3'h0; #100;
+        DIP = 16'h0; PB = 3'h0;
     end
 	
 	// GENERATE CLOCK       
