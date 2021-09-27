@@ -132,7 +132,7 @@ module ARM(
     
     // Programme Counter Logic
     assign PCPlus4 = PC + 32'b100;
-    assign PCPlus8 = PC + 32'b1000;
+    assign PCPlus8 = PCPlus4 + 32'b100;
     assign PC_IN = (PCSrc == 1) ? Result : PCPlus4;    
     assign WE_PC = 1 ; // Will need to control it for multi-cycle operations (Multiplication, Division) and/or Pipelining with hazard hardware.
 
