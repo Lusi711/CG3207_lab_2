@@ -28,27 +28,26 @@ WAIT_START
 	BEQ WAIT_START			; go back and wait if no button is pressed
 WAIT_DIP_1
 	LDR R2, [R8]
+	STR R2, [R10]			; show number on 7-Seg display
 	CMN R2, #0				; check that at least one DIP is turned on
 	BEQ WAIT_DIP_1			; wait for DIP
-	STR R2, [R10]			; show number on 7-Seg display
 WAIT_DP
 	LDR R1, [R9]			; read button state for DP
 	CMN R1, #0				; check for button press
 	BEQ WAIT_DP				; go back and wait if no button is pressed
+	STR R1, [R8, #-4]
 WAIT_DIP_2
 	LDR R3, [R8]
+	STR R3, [R10]			; show number on 7-Seg display
 	CMN R3, #0				; check that at least one DIP is turned on
 	BEQ WAIT_DIP_2			; wait for DIP
-	STR R3, [R10]			; show number on 7-Seg display
 	
 ; Calculate the result and display
-	CMP R1, #0x01
-	BEQ ADDITION
 	CMP R1, #0x02
-	BEQ SUBTRACTION
-	CMP R1, #0x04
+	BMI LOGIC_AND
 	BEQ SHIFT
-ADDITION
+	BNE SUBTRACTION
+LOGIC_AND
 	AND R4, R2, R3
 	STR R4, [R10]
 	B WAIT_START
