@@ -41,6 +41,10 @@ module test_Decoder(
         Rd = 4'b0000; Op = 2'b01; Funct = 6'b0x10x1; #20;
         // STR with +ve immediate offset
         Rd = 4'b0001; Op = 2'b01; Funct = 6'b0x10x0; #20;
+        // LDR with -ve immediate offset
+        Rd = 4'b0000; Op = 2'b01; Funct = 6'b0x00x1; #20;
+        // STR with -ve immediate offset
+        Rd = 4'b0001; Op = 2'b01; Funct = 6'b0x00x0; #20;
         // Add Imm 
         Rd = 4'b0010; Op = 2'b00; Funct = 6'b101000; #20;
         // Sub Reg
