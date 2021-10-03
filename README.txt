@@ -15,7 +15,5 @@ test_CondLogic.v - Testbench for CondLogic.v
 
 test_Decoder.v - Testbench for Decoder.v
 
-test_ARM.v - Testbench for ARM.v
-
 test_Wrapper.v - Testbench for Wrapper.v. Simulates three different operations at one go.
 
