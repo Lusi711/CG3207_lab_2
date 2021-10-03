@@ -9,11 +9,13 @@ CondLogic.v (Lusi) - Assigns N,Z,C,V flags in synchronous block. Outputs PCSrc, 
 
 Decoder.v (Jenny)
 
-ARM.v (Shukai)
+ARM.v (Shukai) - Connect datapath between all the submodules including RegFile, CondLogic, Decoder, Shifter, ALU and ProgramCounter.
 
 test_CondLogic.v - Testbench for CondLogic.v
 
 test_Decoder.v - Testbench for Decoder.v
+
+test_ARM.v - Test bench for ARM.v
 
 test_Wrapper.v - Testbench for Wrapper.v. Simulates three different operations at one go.
 
