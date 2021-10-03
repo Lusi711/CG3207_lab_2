@@ -7,7 +7,7 @@ Procedure:
 
 CondLogic.v (Lusi) - Assigns N,Z,C,V flags in synchronous block. Outputs PCSrc, RegWrite, and MemWrite.
 
-Decoder.v (Jenny) - Combines submodules Main Decoder, ALU Decoder and PC logic. Sets wires Branch and ALUOp. Outputs PCS, RegW, MemW, MemtoReg, ALUSrc, ImmSrc, RegSrc, ALUControl and FlagW. 
+Decoder.v (Jenny) - Combines submodules Main Decoder, ALU Decoder and PC logic. Sets wires Branch and ALUOp. Outputs PCS, RegW, MemW, MemtoReg, ALUSrc, ImmSrc, RegSrc, ALUControl, NoWrite and FlagW. 
 
 ARM.v (Shukai) - Connect datapath between all the submodules including RegFile, CondLogic, Decoder, Shifter, ALU and ProgramCounter.
 
