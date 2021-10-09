@@ -35,7 +35,8 @@
 module Decoder(
     input [3:0] Rd,
     input [1:0] Op,
-    input [5:0] Funct,
+    input [5:0] Funct, //Instr[25:20]
+    input [3:0] MulBits, // Instr[7:4] 1001 for MUL and MLA
     output PCS,
     output RegW,
     output MemW,
@@ -45,76 +46,96 @@ module Decoder(
     output [1:0] RegSrc,
     output NoWrite,
     output reg [1:0] ALUControl,
-    output reg [1:0] FlagW
+    output reg [1:0] FlagW,
+    output Start,
+    output reg [1:0] MCycleOp
     );
     
     wire [1:0] ALUOp;
-    wire Branch ;
+    wire Branch;
     reg [10:0] controls;
     
-    assign {Branch,MemtoReg, MemW, ALUSrc, ImmSrc, RegW, RegSrc, ALUOp} = controls;
+    assign {Branch, MemtoReg, MemW, ALUSrc, ImmSrc, RegW, RegSrc, ALUOp} = controls;
     assign PCS = ((Rd == 4'b1111) & RegW) | Branch;
     assign NoWrite = (Funct[4:0] == 5'b10101) | (Funct[4:0] == 5'b10111);
+    assign Start = (MulBits == 4'b1001 & Op == 2'b00 & Funct[5:2] == 4'b0000) ? 1 : 0;
     
-    //chapter 3 slides 42: updates RegSrc[1:0], ImmSrc[1:0], ALUSrc, MemtoReg, RegW, MemW, Branch, ALUOp (in that order)
-    always @(*) begin
-      case(Op)
-         2'b00: controls = (Funct[5]) ? 11'b0001001x010 : 11'b00000010010; // DP Imm : DP Reg
-         2'b01: begin
-            controls = (Funct[0]) ? 11'b0101011x000 : 11'b0x110101000;  // LDR : STR
-            controls[0] = ~Funct[3];
-         end
-         2'b10: controls = 11'b1001100x100;   // B
-         default: controls = 10'bx;
-      endcase
-      
-      //chapter 3 slides 42: updates ALUControl[1:0] and FlagW[1:0]
-      if (ALUOp == 2'b00) begin
-        ALUControl = 2'b00;
-        FlagW = 2'b00;
-      end else if (ALUOp == 2'b01) begin
-        ALUControl = 2'b01;
-        FlagW = 2'b00;
-      end else if (ALUOp == 2'b10) begin
-        case(Funct[4:1])
-            // ADD
-            4'b0100: begin 
+    //chapter 3 slides 42: updates Branch, MemtoReg, MemW, ALUSrc, ImmSrc[1:0], RegW, RegSrc[1:0], ALUOp[1:0] (in that order)
+    always @(*) 
+    begin
+        if (Start == 0)
+        begin
+            case(Op)
+                2'b00: controls = (Funct[5]) ? 11'b0001001x010 : 11'b00000010010; // DP Imm : DP Reg
+                2'b01: 
+                begin
+                    controls = (Funct[0]) ? 11'b0101011x000 : 11'b0x110101000;  // LDR : STR
+                    controls[0] = ~Funct[3];
+                end
+                2'b10: controls = 11'b1001100x100;   // B
+                default: controls = 10'bx;
+            endcase
+            
+            //chapter 3 slides 42: updates ALUControl[1:0] and FlagW[1:0]
+            if (ALUOp == 2'b00) 
+            begin
                 ALUControl = 2'b00;
-                FlagW = (Funct[0]) ? 2'b11 : 2'b00;
-            end
-            // SUB
-            4'b0010: begin
+                FlagW = 2'b00;
+            end else if (ALUOp == 2'b01) 
+            begin
                 ALUControl = 2'b01;
-                FlagW = (Funct[0]) ? 2'b11 : 2'b00;
-            end
-            // AND
-            4'b0000: begin 
-                ALUControl = 2'b10; 
-                FlagW = (Funct[0]) ? 2'b10 : 2'b00;
-            end
-            // ORR
-            4'b1100: begin 
-                ALUControl = 2'b11; 
-                FlagW = (Funct[0]) ? 2'b10 : 2'b00;
-            end
-            // CMP
-            4'b1010: begin 
-                ALUControl = 2'b01;
-                FlagW = 2'b11;
-            end
-            // CMN
-            4'b1011: begin 
-                ALUControl = 2'b00;
-                FlagW = 2'b11;
-            end
-            default: begin
-                ALUControl = 2'bx; 
+                FlagW = 2'b00;
+            end else if (ALUOp == 2'b10) 
+            begin
+                case(Funct[4:1])
+                    // ADD
+                    4'b0100: begin 
+                        ALUControl = 2'b00;
+                        FlagW = (Funct[0]) ? 2'b11 : 2'b00;
+                    end
+                    // SUB
+                    4'b0010: begin
+                        ALUControl = 2'b01;
+                        FlagW = (Funct[0]) ? 2'b11 : 2'b00;
+                    end
+                    // AND
+                    4'b0000: begin 
+                        ALUControl = 2'b10; 
+                        FlagW = (Funct[0]) ? 2'b10 : 2'b00;
+                    end
+                    // ORR
+                    4'b1100: begin 
+                        ALUControl = 2'b11; 
+                        FlagW = (Funct[0]) ? 2'b10 : 2'b00;
+                    end
+                    // CMP
+                    4'b1010: begin 
+                        ALUControl = 2'b01;
+                        FlagW = 2'b11;
+                    end
+                    // CMN
+                    4'b1011: begin 
+                        ALUControl = 2'b00;
+                        FlagW = 2'b11;
+                    end
+                    default: begin
+                        ALUControl = 2'bx; 
+                        FlagW = 2'b00;
+                    end
+                endcase
+            end else 
+            begin
+                ALUControl = 2'bx;
                 FlagW = 2'b00;
             end
-         endcase
-      end else begin
-        ALUControl = 2'bx;
-        FlagW = 2'b00;
-      end
+        end else // For MUL and DIV  updates Branch, MemtoReg, MemW, ALUSrc, ImmSrc[1:0], RegW, RegSrc[1:0], ALUOp[1:0]
+        begin
+            controls = 11'b00000010011;
+            FlagW = (Funct[0]) ? 2'b11 : 2'b00;
+            if (Funct[1] == 0) // MUL
+                MCycleOp = 2'b01;
+            else if (Funct[1] == 1) //DIV
+                MCycleOp = 2'b11;
+        end
     end
 endmodule
