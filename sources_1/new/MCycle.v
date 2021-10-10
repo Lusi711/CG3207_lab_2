@@ -117,10 +117,37 @@ module MCycle
             count = count + 1;    
         end    
         else begin // Supposed to be Divide. The dummy code below takes 1 cycle to execute, just returns the operands. Change this to signed [ if(~MCycleOp[0]) ] and unsigned [ if(MCycleOp[0]) ] division.
-            temp_sum[2*width-1 : width] = Operand1 ;
-            temp_sum[width-1 : 0] = Operand2 ;
-            done <= 1'b1 ;          
-        end ;
+            if (~count) begin // Signed division
+                if (~MCycleOp[0]) begin
+                    shifted_op1 = (shifted_op1[2 * width - 1]) ? ~(shifted_op1 - 1) : shifted_op1;
+                    shifted_op2 = (shifted_op1[2 * width - 1]) ? ~(shifted_op2 - 1) : shifted_op2;
+                end
+                shifted_op2 = { shifted_op2[width - 1 : 0], {width{1'b0}} };
+                temp_sum = { shifted_op1[width - 1 : 0], {width{1'b0}} }; //Remainder(2*width-1:width), Quotient(width-1:0)
+            end
+            
+            //Subtract the Operand2 register from the Remainder register and place the result in Remainder register
+            temp_sum = temp_sum - shifted_op2;
+            if (temp_sum[2 * width - 1]) begin
+                //Restore the original value by adding the Operand2 register to Remainder register. Shift Quotient register to left, setting new rightmost bit to 0.
+                temp_sum = temp_sum + shifted_op2;
+                temp_sum[width - 1:0] = {temp_sum[width - 2:0], 1'b0};
+            end else begin
+                // Shift quotient register to left, setting new rightmost bit to 1.
+                temp_sum[width - 1:0] = {temp_sum[width - 2:0], 1'b1};
+            end
+            // temp_sum[width-1:0] = {temp_sum[width-2:0], ~temp_sum[2*width-1]}; // Check if no. of gates has reduced with this statement.
+            //Shift Operand2 register right 1 bit
+            shifted_op2 = {1'b0, shifted_op2[2 * width - 1:1]};
+            
+            if (count == width + 1) begin
+                done <= 1'b1;
+                temp_sum[2 * width - 1:width] = ((Operand1[width - 1] ^ Operand2[width - 1]) & ~MCycleOp[0]) ? ~temp_sum[2 * width - 1:width] + 1  : temp_sum[2 * width - 1:width];
+                temp_sum[width - 1:0] = ((Operand1[width - 1] ^ Operand2[width - 1]) & ~MCycleOp[0]) ? ~temp_sum[width - 1:0] + 1  : temp_sum[width - 1:0]; 
+            end
+            
+            count = count + 1;
+        end
         
         Result2 <= temp_sum[2*width-1 : width] ;
         Result1 <= temp_sum[width-1 : 0] ;
