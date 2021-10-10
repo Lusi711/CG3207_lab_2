@@ -66,7 +66,7 @@ module Decoder(
         if (Start == 0)
         begin
             case(Op)
-                2'b00: controls = (Funct[5]) ? 11'b0001001x010 : 11'b00000010010; // DP Imm : DP Reg
+                2'b00: controls = (Funct[5]) ? 11'b0001001x010 : 11'b0000xx10010; // DP Imm : DP Reg
                 2'b01: 
                 begin
                     controls = (Funct[0]) ? 11'b0101011x000 : 11'b0x110101000;  // LDR : STR
