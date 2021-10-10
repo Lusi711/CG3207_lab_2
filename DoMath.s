@@ -18,8 +18,9 @@
 
 ; This sample program prints "Welcome to CG3207" in response to press of button. There should be sufficient time gap between the press of buttons.	
 	LDR R6, DIPS			; Address of DIPS
-	LDR R7, PBS				; Address of pushbuttons
+	LDR R7, PBS			; Address of pushbuttons
 	LDR R8, SEVENSEG		; Address of seven segment display
+	MOV R9, #0              	; Filler 
 WAIT_START
 	LDR R1, [R6, #4]		; read button state
 	CMN R1, #0				; check for button press
@@ -45,6 +46,7 @@ WAIT_DIP_2
 	BMI ADDITION
 	BEQ SHIFT
 	BNE LOGIC_OR
+
 ADDITION
 	ADD R4, R2, #8
 	STR R4, [R8]
@@ -57,6 +59,15 @@ SHIFT
 	ADD R4, R2, R3, LSR #8	
 	STR R4, [R8]
 	B WAIT_START
+MLA_LOGIC
+	MLA R4, R2, R3, R9
+	STR R4, [R8]
+	B WAIT_START
+MUL_LOGIC
+	MUL R4, R2, R3
+	STR R4, [R8]
+	B WAIT_START
+
 halt
 	B    halt				; infinite loop to halt computation. // A program should not "terminate" without an operating system to return control to
 							; keep halt	B halt as the last line of your code.
