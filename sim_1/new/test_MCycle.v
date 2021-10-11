@@ -67,8 +67,8 @@ module test_MCycle(
         // hold reset state for 100 ns.
         #10 ;    
         MCycleOp = 2'b00 ;
-        Operand1 = 4'b1111 ;
-        Operand2 = 4'b1111 ;
+        Operand1 = 4'b0011 ;
+        Operand2 = 4'b1001 ;
         Start = 1'b1 ; // Start is asserted continously(Operations are performed back to back). To try a non-continous Start, you can uncomment the commented lines.    
 
         wait(Busy) ; // suspend initial block till condition becomes true  ;
@@ -76,8 +76,8 @@ module test_MCycle(
         #10 ;
         Start = 1'b0 ;
         #10 ;
-        Operand1 = 4'b0111 ;
-        Operand2 = 4'b1111 ;
+        Operand1 = 4'b1010 ;
+        Operand2 = 4'b0110 ;
         Start = 1'b1 ;
         
         wait(Busy) ; 
@@ -86,8 +86,8 @@ module test_MCycle(
         Start = 1'b0 ;
         #10 ;
         MCycleOp = 2'b01 ;
-        Operand1 = 4'b1111 ;
-        Operand2 = 4'b1111 ;
+        Operand1 = 4'b0111 ;
+        Operand2 = 4'b1101 ;
         Start = 1'b1 ;
 
         wait(Busy) ; 
@@ -95,8 +95,8 @@ module test_MCycle(
         #10 ;
         Start = 1'b0 ;
         #10 ;
-        Operand1 = 4'b0111 ;
-        Operand2 = 4'b1111 ;
+        Operand1 = 4'b0100 ;
+        Operand2 = 4'b0101 ;
         Start = 1'b1 ;
 
         wait(Busy) ; 
@@ -106,7 +106,7 @@ module test_MCycle(
         #10 ;
         MCycleOp = 2'b10 ;
         Operand1 = 4'b1111 ;
-        Operand2 = 4'b1111 ;
+        Operand2 = 4'b0101 ;
         Start = 1'b1 ;
 
         wait(Busy) ; 
@@ -115,7 +115,7 @@ module test_MCycle(
         Start = 1'b0 ;
         #10 ;
         Operand1 = 4'b0111 ;
-        Operand2 = 4'b1111 ;
+        Operand2 = 4'b0011 ;
         Start = 1'b1 ;
 
         wait(Busy) ; 
@@ -125,7 +125,7 @@ module test_MCycle(
         #10 ;
         MCycleOp = 2'b11 ;
         Operand1 = 4'b1111 ;
-        Operand2 = 4'b1111 ;
+        Operand2 = 4'b1001 ;
         Start = 1'b1 ;
 
         wait(Busy) ; 
@@ -133,8 +133,8 @@ module test_MCycle(
         #10 ;
         Start = 1'b0 ;
         #10 ;
-        Operand1 = 4'b0111 ;
-        Operand2 = 4'b1111 ;
+        Operand1 = 4'b0011 ;
+        Operand2 = 4'b1001 ;
         Start = 1'b1 ;
 
         wait(Busy) ; 
