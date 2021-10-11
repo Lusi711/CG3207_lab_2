@@ -43,10 +43,14 @@ module test_MCycle(
     reg [1:0] MCycleOp = 0 ;
     reg [3:0] Operand1 = 0 ;
     reg [3:0] Operand2 = 0 ;
+//    reg [31:0] Operand1 = 0 ;
+//    reg [31:0] Operand2 = 0 ;
 
     // DECLARE OUTPUT SIGNALs
     wire [3:0] Result1 ;
     wire [3:0] Result2 ;
+//    wire [31:0] Result1 ;
+//    wire [31:0] Result2 ;
     wire Busy ;
     
     // INSTANTIATE DEVICE/UNIT UNDER TEST (DUT/UUT)
@@ -62,9 +66,10 @@ module test_MCycle(
         Busy
         ) ;
     
-    // STIMULI
+    // 4 bit STIMULI
     initial begin
         // hold reset state for 100 ns.
+        // START OF SIGNED MUL
         #10 ;    
         MCycleOp = 2'b00 ;
         Operand1 = 4'b1111 ;
@@ -76,10 +81,38 @@ module test_MCycle(
         #10 ;
         Start = 1'b0 ;
         #10 ;
-        Operand1 = 4'b0111 ;
+        Operand1 = 4'b0000 ;
         Operand2 = 4'b1111 ;
         Start = 1'b1 ;
         
+        wait(Busy) ; 
+        wait(~Busy) ;
+        #10 ;
+        Start = 1'b0 ;
+        #10 ;
+        Operand1 = 4'b1111 ;
+        Operand2 = 4'b0000 ;
+        Start = 1'b1 ;
+        
+        wait(Busy) ; 
+        wait(~Busy) ;
+        #10 ;
+        Start = 1'b0 ;
+        #10 ;
+        Operand1 = 4'b1000 ;
+        Operand2 = 4'b0111 ;
+        Start = 1'b1 ;
+        
+        wait(Busy) ; 
+        wait(~Busy) ;
+        #10 ;
+        Start = 1'b0 ;
+        #10 ;
+        Operand1 = 4'b0111 ;
+        Operand2 = 4'b1000 ;
+        Start = 1'b1 ;
+        
+        // START OF UNSIGNED MUL
         wait(Busy) ; 
         wait(~Busy) ;
         #10 ;
@@ -95,16 +128,53 @@ module test_MCycle(
         #10 ;
         Start = 1'b0 ;
         #10 ;
-        Operand1 = 4'b0111 ;
+        Operand1 = 4'b0000 ;
         Operand2 = 4'b1111 ;
         Start = 1'b1 ;
 
+        wait(Busy) ; 
+        wait(~Busy) ; 
+        #10 ;
+        Start = 1'b0 ;
+        #10 ;
+        Operand1 = 4'b1111 ;
+        Operand2 = 4'b0000 ;
+        Start = 1'b1 ;
+        
+        wait(Busy) ; 
+        wait(~Busy) ; 
+        #10 ;
+        Start = 1'b0 ;
+        #10 ;
+        Operand1 = 4'b1000 ;
+        Operand2 = 4'b0111 ;
+        Start = 1'b1 ;
+        
+        wait(Busy) ; 
+        wait(~Busy) ; 
+        #10 ;
+        Start = 1'b0 ;
+        #10 ;
+        Operand1 = 4'b0111 ;
+        Operand2 = 4'b1000 ;
+        Start = 1'b1 ;
+        
+        // START OF SIGNED DIV
         wait(Busy) ; 
         wait(~Busy) ; 
         #10 ;
         Start = 1'b0 ;
         #10 ;
         MCycleOp = 2'b10 ;
+        Operand1 = 4'b0000 ;
+        Operand2 = 4'b1111 ;
+        Start = 1'b1 ;
+
+        wait(Busy) ; 
+        wait(~Busy) ; 
+        #10 ;
+        Start = 1'b0 ;
+        #10 ;
         Operand1 = 4'b1111 ;
         Operand2 = 4'b1111 ;
         Start = 1'b1 ;
@@ -114,16 +184,44 @@ module test_MCycle(
         #10 ;
         Start = 1'b0 ;
         #10 ;
-        Operand1 = 4'b0111 ;
-        Operand2 = 4'b1111 ;
+        Operand1 = 4'b1111 ;
+        Operand2 = 4'b0001 ;
+        Start = 1'b1 ;
+        
+        wait(Busy) ; 
+        wait(~Busy) ; 
+        #10 ;
+        Start = 1'b0 ;
+        #10 ;
+        Operand1 = 4'b1111 ;
+        Operand2 = 4'b0111 ;
         Start = 1'b1 ;
 
+        wait(Busy) ; 
+        wait(~Busy) ; 
+        #10 ;
+        Start = 1'b0 ;
+        #10 ;
+        Operand1 = 4'b1000 ;
+        Operand2 = 4'b0111 ;
+        Start = 1'b1 ;
+        
+        //START OF UNSIGNED DIV
         wait(Busy) ; 
         wait(~Busy) ; 
         #10 ;
         Start = 1'b0 ;
         #10 ;
         MCycleOp = 2'b11 ;
+        Operand1 = 4'b0000 ;
+        Operand2 = 4'b1001 ;
+        Start = 1'b1 ;
+
+        wait(Busy) ; 
+        wait(~Busy) ; 
+        #10 ;
+        Start = 1'b0 ;
+        #10 ;
         Operand1 = 4'b1111 ;
         Operand2 = 4'b1111 ;
         Start = 1'b1 ;
@@ -133,15 +231,191 @@ module test_MCycle(
         #10 ;
         Start = 1'b0 ;
         #10 ;
-        Operand1 = 4'b0111 ;
-        Operand2 = 4'b1111 ;
+        Operand1 = 4'b1111 ;
+        Operand2 = 4'b0001 ;
+        Start = 1'b1 ;
+        
+        wait(Busy) ; 
+        wait(~Busy) ; 
+        #10 ;
+        Start = 1'b0 ;
+        #10 ;
+        Operand1 = 4'b1111 ;
+        Operand2 = 4'b0111 ;
         Start = 1'b1 ;
 
         wait(Busy) ; 
         wait(~Busy) ; 
+        #10 ;
         Start = 1'b0 ;
+        #10 ;
+        Operand1 = 4'b1000 ;
+        Operand2 = 4'b0111 ;
+        Start = 1'b1 ;
     end
      
+  /*  // 32 bit STIMULI
+    initial begin
+        // hold reset state for 100 ns.
+        // START OF SIGNED MUL
+        #10 ;    
+        MCycleOp = 2'b00 ;
+        Operand1 = 32'hFFFFFFFF ;
+        Operand2 = 32'hFFFFFFFF ;
+        Start = 1'b1 ; // Start is asserted continously(Operations are performed back to back). To try a non-continous Start, you can uncomment the commented lines.    
+
+        wait(Busy) ; // suspend initial block till condition becomes true  ;
+        wait(~Busy) ;
+        #10 ;
+        Start = 1'b0 ;
+        #10 ;
+        Operand1 = 32'h1 ;
+        Operand2 = 32'hFFFFFFFF ;
+        Start = 1'b1 ;
+        
+        wait(Busy) ; 
+        wait(~Busy) ;
+        #10 ;
+        Start = 1'b0 ;
+        #10 ;
+        Operand1 = 32'hFFFFFFFF ;
+        Operand2 = 32'h1 ;
+        Start = 1'b1 ;
+        
+        wait(Busy) ; 
+        wait(~Busy) ;
+        #10 ;
+        Start = 1'b0 ;
+        #10 ;
+        Operand1 = 32'h0 ;
+        Operand2 = 32'hFFFFFFFF ;
+        Start = 1'b1 ;
+        
+        wait(Busy) ; 
+        wait(~Busy) ;
+        #10 ;
+        Start = 1'b0 ;
+        #10 ;
+        Operand1 = 32'h011F4EC1 ;
+        Operand2 = 32'hFEC23418 ;
+        Start = 1'b1 ;
+        
+        // START OF UNSIGNED MUL
+        wait(Busy) ; 
+        wait(~Busy) ;
+        #10 ;
+        Start = 1'b0 ;
+        #10 ;
+        MCycleOp = 2'b01 ;
+        Operand1 = 32'hFFFFFFFF ;
+        Operand2 = 32'hFFFFFFFF ;
+        Start = 1'b1 ;
+
+        wait(Busy) ; 
+        wait(~Busy) ; 
+        #10 ;
+        Start = 1'b0 ;
+        #10 ;
+        Operand1 = 32'h1 ;
+        Operand2 = 32'hFFFFFFFF ;
+        Start = 1'b1 ;
+
+        wait(Busy) ; 
+        wait(~Busy) ; 
+        #10 ;
+        Start = 1'b0 ;
+        #10 ;
+        Operand1 = 32'hFFFFFFFF ;
+        Operand2 = 32'h1 ;
+        Start = 1'b1 ;
+        
+        wait(Busy) ; 
+        wait(~Busy) ; 
+        #10 ;
+        Start = 1'b0 ;
+        #10 ;
+        Operand1 = 32'h0 ;
+        Operand2 = 32'hFFFFFFFF ;
+        Start = 1'b1 ;
+        
+        // START OF SIGNED DIV
+        wait(Busy) ; 
+        wait(~Busy) ; 
+        #10 ;
+        Start = 1'b0 ;
+        #10 ;
+        MCycleOp = 2'b10 ;
+        Operand1 = 32'hFFFFFFFF ;
+        Operand2 = 32'hFFFFFFFF ;
+        Start = 1'b1 ;
+
+        wait(Busy) ; 
+        wait(~Busy) ; 
+        #10 ;
+        Start = 1'b0 ;
+        #10 ;
+        Operand1 = 32'hFFFFFFFF ;
+        Operand2 = 32'h1 ;
+        Start = 1'b1 ;
+
+        wait(Busy) ; 
+        wait(~Busy) ; 
+        #10 ;
+        Start = 1'b0 ;
+        #10 ;
+        Operand1 = 32'h1 ;
+        Operand2 = 32'hFFFFFFFF ;
+        Start = 1'b1 ;
+        
+        wait(Busy) ; 
+        wait(~Busy) ; 
+        #10 ;
+        Start = 1'b0 ;
+        #10 ;
+        Operand1 = 32'h0 ;
+        Operand2 = 32'hFFFFFFFF ;
+        Start = 1'b1 ;
+        
+        //START OF UNSIGNED DIV
+        wait(Busy) ; 
+        wait(~Busy) ; 
+        #10 ;
+        Start = 1'b0 ;
+        #10 ;
+        MCycleOp = 2'b11 ;
+        Operand1 = 32'hFFFFFFFF ;
+        Operand2 = 32'hFFFFFFFF ;
+        Start = 1'b1 ;
+
+        wait(Busy) ; 
+        wait(~Busy) ; 
+        #10 ;
+        Start = 1'b0 ;
+        #10 ;
+        Operand1 = 32'hFFFFFFFF ;
+        Operand2 = 32'h1 ;
+        Start = 1'b1 ;
+
+        wait(Busy) ; 
+        wait(~Busy) ; 
+        #10 ;
+        Start = 1'b0 ;
+        #10 ;
+        Operand1 = 32'h1 ;
+        Operand2 = 32'hFFFFFFFF ;
+        Start = 1'b1 ;
+        
+        wait(Busy) ; 
+        wait(~Busy) ; 
+        #10 ;
+        Start = 1'b0 ;
+        #10 ;
+        Operand1 = 32'h0 ;
+        Operand2 = 32'hFFFFFFFF ;
+        Start = 1'b1 ;
+    end */
+    
+    
     // GENERATE CLOCK       
     always begin 
         #5 CLK = ~CLK ; 
