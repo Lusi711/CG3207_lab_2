@@ -15,13 +15,13 @@
 	  
 ; ------- <code memory (ROM mapped to Instruction Memory) begins>
 ; Total number of instructions should not exceed 127 (126 excluding the last line 'halt B halt').
-
-; This sample program prints "Welcome to CG3207" in response to press of button. There should be sufficient time gap between the press of buttons.	
+	
+	LDR R5, ZERO; 			; R5 stores the constant 0, which we need frequently as we do not have MOV implemented. Hence, something like MOV R1, #4 is accomplished by ADD R1, R6, #4
 	LDR R6, DIPS			; Address of DIPS
-	LDR R7, PBS			; Address of pushbuttons
+	LDR R7, PBS				; Address of pushbuttons
 	LDR R8, SEVENSEG		; Address of seven segment display
-	MOV R9, #0              	; Filler 
 WAIT_START
+	STR R5, [R6, #-4]
 	LDR R1, [R6, #4]		; read button state
 	CMN R1, #0				; check for button press
 	BEQ WAIT_START			; go back and wait if no button is pressed
@@ -34,7 +34,6 @@ WAIT_DP
 	LDR R1, [R7]			; read button state for DP
 	CMN R1, #0				; check for button press
 	BEQ WAIT_DP				; go back and wait if no button is pressed
-	STR R1, [R6, #-4]
 WAIT_DIP_2
 	LDR R3, [R6]
 	STR R3, [R8]			; show number on 7-Seg display
@@ -44,34 +43,39 @@ WAIT_DIP_2
 ; Calculate the result and display
 	CMP R1, #0x02
 	BMI ADDITION
-	BEQ SHIFT
-	BNE LOGIC_OR
+	BEQ MUL_LOGIC
+	BNE MLA_LOGIC
 
 ADDITION
-	ADD R4, R2, #8
-	STR R4, [R8]
+	ADD R4, R2, R3
+	STR R4, [R8]			; 7-Seg shows the sum of R2 and R3
+	STR R1, [R6, #-4]		; LEDs indicate end of operation
 	B WAIT_START
 LOGIC_OR
 	ORR R4, R2, R3
-	STR R4, [R8]
+	STR R4, [R8]			; 7-Seg shows (R2 BITWISE OR R3)
+	STR R1, [R6, #-4]		; LEDs indicate end of operation
 	B WAIT_START
 SHIFT
 	ADD R4, R2, R3, LSR #8	
-	STR R4, [R8]
+	STR R4, [R8]			; 7-Seg shows (R2 + (R3 >> 8))
+	STR R1, [R6, #-4]		; LEDs indicate end of operation
 	B WAIT_START
 MLA_LOGIC
-	MLA R4, R2, R3, R9
-	STR R4, [R8]
+	MLA R4, R2, R3, R9		; Replaces DIV operation in ARMv3
+	STR R4, [R8]			; 7-Seg shows quotient of R2 / R3
+	STR R1, [R6, #-4]		; LEDs indicate end of operation
 	B WAIT_START
 MUL_LOGIC
-	MUL R4, R2, R3
-	STR R4, [R8]
+	MUL R4, R2, R3			
+	STR R4, [R8]			; 7-Seg shows (R2 * R3)
+	STR R1, [R6, #-4]		; LEDs indicate end of operation
 	B WAIT_START
 
 halt
 	B    halt				; infinite loop to halt computation. // A program should not "terminate" without an operating system to return control to
 							; keep halt	B halt as the last line of your code.
-
+							
 ; ------- <\code memory (ROM mapped to Instruction Memory) ends>
 
 
@@ -103,7 +107,7 @@ ZERO
 LSB_MASK
 		DCD 0x000000FF		; constant 0xFF
 DELAY_VAL
-		DCD 0x00000004		; delay time.
+		DCD 0x00000002		; delay time.
 variable1_addr
 		DCD variable1		; address of variable1. Required since we are avoiding pseudo-instructions // unsigned int * const variable1_addr = &variable1;
 constant1
@@ -130,4 +134,4 @@ variable1
 		
 ;const int* x;         // x is a non-constant pointer to constant data
 ;int const* x;         // x is a non-constant pointer to constant data 
-;int*const x;          // x is a constant pointer to non-constant data
+;int*const x;          // x is a constant pointer to non-constant dat
