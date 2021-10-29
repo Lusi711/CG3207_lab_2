@@ -28,10 +28,10 @@ module test_CondLogic(
     reg [1:0] FlagW;
     reg [3:0] Cond;
     reg [3:0] ALUFlags;
-    wire PCSrc, RegWrite, MemWrite;
+    wire PCSrc, RegWrite, MemWrite, C_Flag;
     
     // Instantiate UUT
-    CondLogic dut(CLK, PCS, RegW, NoWrite, MemW, FlagW, Cond, ALUFlags, PCSrc, RegWrite, MemWrite);
+    CondLogic dut(CLK, PCS, RegW, NoWrite, MemW, FlagW, Cond, ALUFlags, PCSrc, RegWrite, MemWrite, C_Flag);
     
     // STIMULI
     initial

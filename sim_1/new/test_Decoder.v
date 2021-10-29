@@ -52,7 +52,7 @@ module test_Decoder(
         Rd = 4'b0010; Op = 2'b00; Funct = 6'b101000; MulBits = 4'bx; #20;
         // Sub Reg without imm shift
         Rd = 4'b0011; Op = 2'b00; Funct = 6'b000100; MulBits = 4'bx000; #50;
-        // And Reg with  Imm Shift
+        // And Reg with Imm Shift
         Rd = 4'b0100; Op = 2'b00; Funct = 6'b000000; MulBits = 4'b1xx0; #50;
         // B
         Rd = 4'b0100; Op = 2'b10; Funct = 6'b10xxxx; MulBits = 4'bx; #50; 
@@ -64,6 +64,18 @@ module test_Decoder(
         Rd = 4'b0111; Op = 2'b00; Funct = 6'b000000; MulBits = 4'b1001; #50;
         // DIV (MLA)
         Rd = 4'b1000; Op = 2'b00; Funct = 6'b000010; MulBits = 4'b1001; #50;
+        // RSC Imm
+        Rd = 4'b1001; Op = 2'b00; Funct = 6'b101110; MulBits = 4'bx; #50;
+        // RSC Reg
+        Rd = 4'b1001; Op = 2'b00; Funct = 6'b001110; MulBits = 4'bxxx0; #50;
+        // TST Imm
+        Rd = 4'b0; Op = 2'b00; Funct = 6'b110001; MulBits = 4'bx; #50;
+        // TST Reg
+        Rd = 4'b0; Op = 2'b00; Funct = 6'b010001; MulBits = 4'bxxx0; #50;
+        // TST Imm
+        Rd = 4'b0; Op = 2'b00; Funct = 6'b110011; MulBits = 4'bx; #50;
+        // TST Reg
+        Rd = 4'b0; Op = 2'b00; Funct = 6'b010011; MulBits = 4'bxxx0; #50;
         // End operation
         Rd = 4'b0; Op = 2'b00; Funct = 6'b0; MulBits = 4'b0; #50;
     end

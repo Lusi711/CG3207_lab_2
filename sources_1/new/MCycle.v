@@ -65,8 +65,12 @@ module MCycle
     
     reg sign = 0;
     reg Q_prev;
-	reg [2*width:0] store_subtract;
-   
+	reg [2*width:0] temp;
+	reg [2 * width - 1:0] acc;
+    
+    // ALU Flags
+    wire N, Z, C, V ;
+    
     always@( state, done, Start, RESET ) begin : IDLE_PROCESS  
 		// Note : This block uses non-blocking assignments to get around an unpredictable Verilog simulation behaviour.
         // default outputs
@@ -100,60 +104,60 @@ module MCycle
         // n_state == COMPUTING and state == IDLE implies we are just transitioning into COMPUTING
         if( RESET | (n_state == COMPUTING & state == IDLE) ) begin // 2nd condition is true during the very 1st clock cycle of the multiplication
             count = 0 ;
-            temp_sum = 0 ;
+            acc = 0;
             Q_prev = 0;
             shifted_op1 = { {width{~MCycleOp[0] & Operand1[width-1]}}, Operand1 } ; // sign extend the operands  
             shifted_op2 = { {width{~MCycleOp[0] & Operand2[width-1]}}, Operand2 } ;
+            
             sign = (shifted_op1[2 * width - 1] ^ shifted_op2[2 * width - 1]) & ~MCycleOp[0]; 
         end
         done <= 1'b0 ;
-        if( ~MCycleOp[1] & (count < width)) begin // Multiply
+        if(~MCycleOp[1]) begin // Multiply
             // if( ~MCycleOp[0] ), takes 2*'width' cycles to execute, returns signed(Operand1)*signed(Operand2)
-            // if( MCycleOp[0] ), takes 'width' cycles to execute, returns unsigned(Operand1)*unsigned(Operand2)        
+            // if( MCycleOp[0] ), takes 'width' cycles to execute, returns unsigned(Operand1)*unsigned(Operand2)
             if( ~MCycleOp[0] ) begin
-                if ((shifted_op2[0] == 0) && (Q_prev == 1)) begin
-                    temp_sum = temp_sum + shifted_op1;
-				end else if (shifted_op2[0] == 1 && Q_prev == 0) begin
-				    temp_sum = temp_sum + ~shifted_op1 + 1;								
+                if (~shifted_op2[0] & Q_prev) begin
+                    acc = acc + shifted_op1;
+				end else if (shifted_op2[0] & ~Q_prev) begin
+				    acc = acc - shifted_op1;								
 			    end
 				Q_prev = shifted_op2[0];
-			    shifted_op2[width - 1:0] = {temp_sum[0], shifted_op2[width - 1:1]};
-			    temp_sum[width - 1:0] = {temp_sum[width - 1], temp_sum[width - 1:1]};
+			    shifted_op2[width - 1:0] = {acc[0], shifted_op2[width - 1:1]};
+			    acc[width - 1:0] = {acc[width], acc[width - 1:1]};
             end else begin
                 if( shifted_op2[0] ) // add only if b0 = 1
-                    temp_sum = temp_sum + shifted_op1 ; // partial product for multiplication
+                    acc = acc + shifted_op1 ; // partial product for multiplication
                 
                 shifted_op2 = {1'b0, shifted_op2[2*width-1 : 1]} ;
                 shifted_op1 = {shifted_op1[2*width-2 : 0], 1'b0} ;    
             end
             if(count == width-1) begin// last cycle?
                 done <= 1'b1 ;
-                temp_sum = (MCycleOp[0]) ? temp_sum : { temp_sum[width - 1:0], shifted_op2[width - 1:0] };   
-    
+                temp_sum = (MCycleOp[0]) ? acc : { acc[width - 1:0], shifted_op2[width - 1:0] };   
             end
         end
-        else if ( MCycleOp[1] & (count <= width)) begin // Supposed to be Divide. The dummy code below takes 1 cycle to execute, just returns the operands. Change this to signed [ if(~MCycleOp[0]) ] and unsigned [ if(MCycleOp[0]) ] division.
+        else if (MCycleOp[1]) begin // Supposed to be Divide. The dummy code below takes 1 cycle to execute, just returns the operands. Change this to signed [ if(~MCycleOp[0]) ] and unsigned [ if(MCycleOp[0]) ] division.
             if (count == 0) begin
                 if (MCycleOp[0]) begin
-                    shifted_op1 = { {width{1'b0}}, shifted_op1[width - 1:0] };
+                    shifted_op2 = { 1'b0, shifted_op2[width -1:0], {(width - 1){1'b0}} };
                 end else begin
                     shifted_op1 = (shifted_op1[2 * width - 1]) ? ~(shifted_op1 - 1) : shifted_op1;
                     shifted_op2 = (shifted_op2[2 * width - 1]) ? ~(shifted_op2 - 1) : shifted_op2;
+                    shifted_op2 = { shifted_op2[width - 1:0], {(width){1'b0}} };
                 end
-				shifted_op2 = { shifted_op2[width - 1:0], {(width){1'b0}} };
-                temp_sum = { shifted_op1[width-1:0], {(width){1'b0}} };
             end
             //Subtract the Operand2 register from the Remainder register.
-            store_subtract = shifted_op1 + ~shifted_op2 + 1;
-			shifted_op1 = (store_subtract[2 * width]) ? shifted_op1 : store_subtract[2 * width - 1:0];
-            temp_sum[width-1:0] = {shifted_op1[width - 1:0], temp_sum[width-2:0], ~store_subtract[2*width]};
+            shifted_op1 = shifted_op1 - shifted_op2;
+            acc[width - 1:0] = {acc[width - 2:0], ~shifted_op1[2 * width - 1]};
+            if (shifted_op1[2 * width - 1])
+                shifted_op1 = shifted_op1 + shifted_op2;
             //Shift Operand2 register right 1 bit
             shifted_op2 = {1'b0, shifted_op2[2 * width - 1:1]};
             
-            if (count == width) begin
+            if ((~MCycleOp[0] & (count == width)) |  (MCycleOp[0] & (count == width - 1))) begin
                 done <= 1'b1;
                 temp_sum[2 * width - 1:width] = (sign) ? ~shifted_op1[width - 1:0] + 1  : shifted_op1[width - 1:0];
-                temp_sum[width - 1:0] = (sign) ? ~temp_sum[width - 1:0] + 1  : temp_sum[width - 1:0];
+                temp_sum[width - 1:0] = (sign) ? ~acc[width - 1:0] + 1  : acc[width - 1:0];
             end
         end
         
@@ -163,6 +167,11 @@ module MCycle
         Result1 <= temp_sum[width-1 : 0] ;
     end
    
-   assign ALUFlags[3:0] = 4'b0000;
+   assign N = Result1[width - 1];
+   assign Z = (Result1 == 0) ? 1 : 0;
+   assign C = 0;
+   assign V = 0;
+   
+   assign ALUFlags = {N, Z, C, V} ;
 
 endmodule

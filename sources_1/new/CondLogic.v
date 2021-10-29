@@ -43,7 +43,8 @@ module CondLogic(
     input [3:0] ALUFlags,
     output PCSrc,
     output RegWrite,
-    output MemWrite
+    output MemWrite,
+    output C_Flag
     );
     
     reg CondEx ;
@@ -51,6 +52,7 @@ module CondLogic(
     //<extra signals, if any>
     wire [1:0] FlagWrite;
     
+    assign C_Flag = C;
     assign FlagWrite[0] = FlagW[0] & CondEx;
     assign FlagWrite[1] = FlagW[1] & CondEx;
     // Set values of N, Z, C, V flags when required

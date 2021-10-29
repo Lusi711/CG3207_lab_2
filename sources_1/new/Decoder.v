@@ -45,7 +45,7 @@ module Decoder(
     output [1:0] ImmSrc,
     output [1:0] RegSrc,
     output NoWrite,
-    output reg [1:0] ALUControl,
+    output reg [3:0] ALUControl,
     output reg [1:0] FlagW,
     output Start,
     output reg [1:0] MCycleOp
@@ -57,8 +57,8 @@ module Decoder(
     
     assign {Branch, MemtoReg, MemW, ALUSrc, ImmSrc, RegW, RegSrc, ALUOp} = controls;
     assign PCS = ((Rd == 4'b1111) & RegW) | Branch;
-    assign NoWrite = (Funct[4:0] == 5'b10101) | (Funct[4:0] == 5'b10111);
-    assign Start = (MulBits == 4'b1001 & Op == 2'b00 & Funct[5:2] == 4'b0000) ? 1 : 0;
+    assign NoWrite = (Op == 2'b00) & (Funct[4:3] == 2'b10) & Funct[0];
+    assign Start = (MulBits == 4'b1001) & (Op == 2'b00) & (Funct[5:2] == 4'b0000);
     
     //chapter 3 slides 42: updates Branch, MemtoReg, MemW, ALUSrc, ImmSrc[1:0], RegW, RegSrc[1:0], ALUOp[1:0] (in that order)
     always @(*) 
@@ -90,52 +90,65 @@ module Decoder(
                 case(Funct[4:1])
                     // ADD
                     4'b0100: begin 
-                        ALUControl = 2'b00;
+                        ALUControl = 4'b0000;
                         FlagW = (Funct[0]) ? 2'b11 : 2'b00;
                     end
                     // SUB
                     4'b0010: begin
-                        ALUControl = 2'b01;
+                        ALUControl = 4'b0010;
                         FlagW = (Funct[0]) ? 2'b11 : 2'b00;
                     end
                     // AND
                     4'b0000: begin 
-                        ALUControl = 2'b10; 
+                        ALUControl = 4'b0100; 
                         FlagW = (Funct[0]) ? 2'b10 : 2'b00;
                     end
                     // ORR
                     4'b1100: begin 
-                        ALUControl = 2'b11; 
+                        ALUControl = 4'b0110; 
                         FlagW = (Funct[0]) ? 2'b10 : 2'b00;
                     end
                     // CMP
                     4'b1010: begin 
-                        ALUControl = 2'b01;
+                        ALUControl = 4'b0010;
                         FlagW = 2'b11;
                     end
                     // CMN
                     4'b1011: begin 
-                        ALUControl = 2'b00;
+                        ALUControl = 4'b0000;
                         FlagW = 2'b11;
                     end
+                    // RSC
+                    4'b0111: begin
+                        ALUControl = 4'b1001;
+                        FlagW = (Funct[0]) ? 2'b11 : 2'b00;
+                    end
+                    // TST
+                    4'b1000: begin
+                        ALUControl = 4'b0100;
+                        FlagW = 2'b10;
+                    end
+                    // TEQ
+                    4'b1001: begin
+                        ALUControl = 4'b1010;
+                        FlagW = 2'b10;
+                    end
                     default: begin
-                        ALUControl = 2'bx; 
-                        FlagW = 2'b00;
+                        ALUControl = 4'bx; 
+                        FlagW = 2'bx;
                     end
                 endcase
             end else 
             begin
                 ALUControl = 2'bx;
-                FlagW = 2'b00;
+                FlagW = 2'bx;
             end
         end else // For MUL and DIV  updates Branch, MemtoReg, MemW, ALUSrc, ImmSrc[1:0], RegW, RegSrc[1:0], ALUOp[1:0]
         begin
-            controls = 11'b00000010011;
-            FlagW = (Funct[0]) ? 2'b11 : 2'b00;
-            if (Funct[1] == 0) // MUL
-                MCycleOp = 2'b01;
-            else if (Funct[1] == 1) //DIV
-                MCycleOp = 2'b11;
+            controls = 11'b0000XX10011;
+            ALUControl = 4'bx;
+            FlagW = (Funct[1:0] == 2'b01) ? 2'b10 : 2'b00;
+            MCycleOp = Funct[1] ? 2'b11 : 2'b01; // MUL if Funct[1] = 0, DIV if Funct[1] = 1
         end
     end
 endmodule
