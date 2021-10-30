@@ -71,6 +71,12 @@ module ALU(
             end
             // AND/TST
             4'b0100: ALUResult_i <= Src_A & Src_B ;
+            // BIC
+            4'b0101: ALUResult_i <= Src_A & (~Src_B);
+            // MOV
+            4'b1100: ALUResult_i <= Src_A;
+            // MVN
+            4'b1101: ALUResult_i <= ~Src_A;
             // ORR
             4'b0110: ALUResult_i <= Src_A | Src_B ; 
             //EOR/TEQ
@@ -85,7 +91,7 @@ module ALU(
                 Src_B_comp <= {1'b0, ~Src_A};
                 ALUResult_i <= S_wider[31:0];
                 V <= (C_Flag) ? ( Src_B[31] ~^ ~Src_A[31] )  & ( ~Src_A[31] ^ S_wider[31] ) : ( Src_B[31] ^ Src_A[31] )  & ( Src_A[31] ~^ S_wider[31] );
-            end              
+            end      
         endcase ;
     end
     

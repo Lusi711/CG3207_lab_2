@@ -76,14 +76,14 @@ module Decoder(
                 default: controls = 10'bx;
             endcase
             
-            //chapter 3 slides 42: updates ALUControl[1:0] and FlagW[1:0]
+            //chapter 3 slides 42: updates ALUControl[3:0] and FlagW[1:0]
             if (ALUOp == 2'b00) 
             begin
-                ALUControl = 2'b00;
+                ALUControl = 4'b0000;
                 FlagW = 2'b00;
             end else if (ALUOp == 2'b01) 
             begin
-                ALUControl = 2'b01;
+                ALUControl = 4'b0010;
                 FlagW = 2'b00;
             end else if (ALUOp == 2'b10) 
             begin
@@ -133,14 +133,29 @@ module Decoder(
                         ALUControl = 4'b1010;
                         FlagW = 2'b10;
                     end
+                    // BIC
+                    4'b1110: begin
+                        ALUControl = 4'b0101; 
+                        FlagW = (Funct[0]) ? 2'b10 : 2'b00;
+                    end
+                    // MOV
+                    4'b1101: begin
+                        ALUControl = 4'b1100; 
+                        FlagW = (Funct[0]) ? 2'b10 : 2'b00;
+                    end
+                    // MVN
+                    4'b1111: begin
+                        ALUControl = 4'b1101; 
+                        FlagW = (Funct[0]) ? 2'b10 : 2'b00;
+                    end
                     default: begin
                         ALUControl = 4'bx; 
-                        FlagW = 2'bx;
+                        FlagW = (Funct[0]) ? 2'b10 : 2'b00;
                     end
                 endcase
             end else 
             begin
-                ALUControl = 2'bx;
+                ALUControl = 4'bx;
                 FlagW = 2'bx;
             end
         end else // For MUL and DIV  updates Branch, MemtoReg, MemW, ALUSrc, ImmSrc[1:0], RegW, RegSrc[1:0], ALUOp[1:0]
