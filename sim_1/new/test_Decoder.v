@@ -72,10 +72,22 @@ module test_Decoder(
         Rd = 4'b0; Op = 2'b00; Funct = 6'b110001; MulBits = 4'bx; #50;
         // TST Reg
         Rd = 4'b0; Op = 2'b00; Funct = 6'b010001; MulBits = 4'bxxx0; #50;
-        // TST Imm
+        // TEQ Imm
         Rd = 4'b0; Op = 2'b00; Funct = 6'b110011; MulBits = 4'bx; #50;
-        // TST Reg
+        // TEQ Reg
         Rd = 4'b0; Op = 2'b00; Funct = 6'b010011; MulBits = 4'bxxx0; #50;
+        // BIC Imm
+        Rd = 4'b1001; Op = 2'b00; Funct = 6'b111100; MulBits = 4'bx; #50;
+        // BIC Reg
+        Rd = 4'b1001; Op = 2'b00; Funct = 6'b011100; MulBits = 4'bxxx0; #50;
+        // MOV Imm
+        Rd = 4'b1001; Op = 2'b00; Funct = 6'b111010; MulBits = 4'bx; #50;
+        // MOV Reg
+        Rd = 4'b1001; Op = 2'b00; Funct = 6'b011010; MulBits = 4'bxxx0; #50;
+        // MVN Imm
+        Rd = 4'b1001; Op = 2'b00; Funct = 6'b111110; MulBits = 4'bx; #50;
+        // MVN Reg
+        Rd = 4'b1001; Op = 2'b00; Funct = 6'b011110; MulBits = 4'bxxx0; #50;
         // End operation
         Rd = 4'b0; Op = 2'b00; Funct = 6'b0; MulBits = 4'b0; #50;
     end
