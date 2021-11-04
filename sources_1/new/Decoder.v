@@ -83,7 +83,7 @@ module Decoder(
                 FlagW = 2'b00;
             end else if (ALUOp == 2'b01) 
             begin
-                ALUControl = 2'b0010;
+                ALUControl = 4'b0010;
                 FlagW = 2'b00;
             end else if (ALUOp == 2'b10) 
             begin
@@ -132,6 +132,21 @@ module Decoder(
                     4'b1001: begin
                         ALUControl = 4'b1010;
                         FlagW = 2'b10;
+                    end
+                    // BIC
+                    4'b1110: begin
+                        ALUControl = 4'b0101; 
+                        FlagW = (Funct[0]) ? 2'b10 : 2'b00;
+                    end
+                    // MOV
+                    4'b1101: begin
+                        ALUControl = 4'b1100; 
+                        FlagW = (Funct[0]) ? 2'b10 : 2'b00;
+                    end
+                    // MVN
+                    4'b1111: begin
+                        ALUControl = 4'b1101; 
+                        FlagW = (Funct[0]) ? 2'b10 : 2'b00;
                     end
                     default: begin
                         ALUControl = 4'b1111; 

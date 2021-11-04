@@ -71,6 +71,12 @@ module ALU(
             end
             // AND/TST
             4'b0100: ALUResult_i <= Src_A & Src_B ;
+            // BIC
+            4'b0101: ALUResult_i <= Src_A & (~Src_B);
+            // MOV
+            4'b1100: ALUResult_i <= Src_A;
+            // MVN
+            4'b1101: ALUResult_i <= ~Src_A;
             // ORR
             4'b0110: ALUResult_i <= Src_A | Src_B ; 
             //EOR/TEQ
