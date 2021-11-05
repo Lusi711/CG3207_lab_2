@@ -148,6 +148,26 @@ module Decoder(
                         ALUControl = 4'b1101; 
                         FlagW = (Funct[0]) ? 3'b110 : 3'b000;
                     end
+                    // EOR
+                    4'b0001: begin
+                        ALUControl = 4'b1010; 
+                        FlagW = (Funct[0]) ? 3'b110 : 3'b000;
+                    end
+                    // ADC
+                    4'b0101: begin
+                        ALUControl = 4'b0001; 
+                        FlagW = (Funct[0]) ? 3'b110 : 3'b000;
+                    end
+                    // SBC
+                    4'b0110: begin
+                        ALUControl = 4'b0011; 
+                        FlagW = (Funct[0]) ? 3'b110 : 3'b000;
+                    end
+                    // RSB
+                    4'b0011: begin
+                        ALUControl = 4'b1000; 
+                        FlagW = (Funct[0]) ? 3'b110 : 3'b000;
+                    end
                     default: begin
                         ALUControl = 4'b1111; 
                         FlagW = 3'b000;
