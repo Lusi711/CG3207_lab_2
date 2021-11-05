@@ -69,16 +69,9 @@ module ARM(
     wire [1:0] Op ;
     wire [5:0] Funct ;
     wire [3:0] MulBits;
-    //wire PCS ;
-    //wire RegW ;
-    //wire MemW ;
     wire MemtoReg ;
     wire ALUSrc ;
-    //wire [1:0] ImmSrc ;
     wire [1:0] RegSrc ;
-    //wire NoWrite ;
-    //wire [1:0] ALUControl ;
-    //wire [1:0] FlagW ;
     
     // CondLogic signals
     //wire CLK ;
@@ -88,7 +81,6 @@ module ARM(
     wire MemW ;
     wire [2:0] FlagW ;
     wire [3:0] Cond ;
-    //wire [3:0] ALUFlags,
     wire PCSrc ;
     wire RegWrite ; 
     //wire MemWrite
@@ -121,11 +113,8 @@ module ARM(
     wire [3:0] ALUFlagsFromMCycle;
     
     // ProgramCounter signals
-    //wire CLK ;
-    //wire RESET ;
     wire WE_PC ;    
     wire [31:0] PC_IN ;
-    //wire [31:0] PC ; 
         
     // Other internal signals here
     wire [31:0] PCPlus4 ;

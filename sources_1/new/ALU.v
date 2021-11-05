@@ -61,16 +61,33 @@ module ALU(
             begin
                 ALUResult_i <= S_wider[31:0] ;
                 C <= S_wider[32];
-                V <= ( Src_A[31] ~^ Src_B[31] )  & ( Src_B[31] ^ S_wider[31] );          
+                V <= ( Src_A[31] ~^ Src_B[31] ) & ( Src_B[31] ^ S_wider[31] );          
+            end
+            // ADD with Carry / ADC
+            4'b0001:  
+            begin
+                C_0 <= C_Flag;
+                ALUResult_i <= S_wider[31:0] ;
+                C <= S_wider[32];
+                V <= ( Src_A[31] ~^ Src_B[31] ) & ( Src_B[31] ^ S_wider[31] );          
             end
             // SUB without Carry / CMP
             4'b0010:  
             begin
-                C_0[0] <= 1 ;  
+                C_0[0] <= 1;  
                 Src_B_comp <= {1'b0, ~ Src_B} ;
                 ALUResult_i <= S_wider[31:0] ;
                 C <= S_wider[32];
-                V <= ( Src_A[31] ^ Src_B[31] )  & ( Src_B[31] ~^ S_wider[31] );       
+                V <= ( Src_A[31] ^ Src_B[31] ) & ( Src_B[31] ~^ S_wider[31] );       
+            end
+            // SUB with Carry / SBC
+            4'b0011:  
+            begin
+                C_0[0] <= C_Flag ;  
+                Src_B_comp <= {1'b0, ~ Src_B} ;
+                ALUResult_i <= S_wider[31:0] ;
+                C <= S_wider[32];
+                V <= ( Src_A[31] ^ Src_B[31] ) & ( Src_B[31] ~^ S_wider[31] );     
             end
             // AND/TST
             4'b0100: 
@@ -87,6 +104,7 @@ module ALU(
             // MOV
             4'b1100: 
             begin
+                ALUResult_i <= Src_B;
                 C <= shifter_carry_out;
             end
             // MVN
@@ -100,13 +118,23 @@ module ALU(
                 ALUResult_i <= Src_A | Src_B ; 
                 C <= shifter_carry_out;
             end
-            //EOR/TEQ
+            // EOR/TEQ
             4'b1010: 
             begin
                 ALUResult_i <= Src_A ^ Src_B;
                 C <= shifter_carry_out;
             end
-            // RSB with Carry
+            // RSB
+            4'b1000: 
+            begin
+                C_0[0] <= 1 ;  
+                Src_A_comp <= {1'b0, Src_B};
+                Src_B_comp <= {1'b0, ~Src_A};
+                ALUResult_i <= S_wider[31:0];
+                C <= S_wider[32];
+                V <= ( Src_B[31] ^ Src_A[31] ) & ( Src_A[31] ~^ S_wider[31] );
+            end
+            // RSB with Carry (RSC)
             4'b1001:
             begin
                 C_0[0] <= C_Flag;
@@ -114,7 +142,7 @@ module ALU(
                 Src_B_comp <= {1'b0, ~Src_A};
                 ALUResult_i <= S_wider[31:0];
                 C <= S_wider[32];
-                V <= ( Src_B[31] ^ Src_A[31] )  & ( Src_A[31] ~^ S_wider[31] );
+                V <= ( Src_B[31] ^ Src_A[31] ) & ( Src_A[31] ~^ S_wider[31] );
             end              
         endcase ;
     end
