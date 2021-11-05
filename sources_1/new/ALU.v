@@ -31,6 +31,7 @@ module ALU(
     input [31:0] Src_A,
     input [31:0] Src_B,
     input C_Flag,
+    input shifter_carry_out,
     input [3:0] ALUControl,
     output [31:0] ALUResult,
     output [3:0] ALUFlags
@@ -41,12 +42,12 @@ module ALU(
     reg [32:0] Src_B_comp ;
     reg [31:0] ALUResult_i ;
     reg [32:0] C_0 ;
-    wire N, Z, C ;
-    reg V ;
+    wire N, Z;
+    reg C, V ;
     
     assign S_wider = Src_A_comp + Src_B_comp + C_0 ;
     
-    always@(Src_A, Src_B, C_Flag, ALUControl, S_wider) begin
+    always@(Src_A, Src_B, C_Flag, shifter_carry_out, ALUControl, S_wider) begin
         // default values; help avoid latches
         C_0 <= 0 ; 
         Src_A_comp <= {1'b0, Src_A} ;
@@ -55,49 +56,71 @@ module ALU(
         V <= 0 ;
     
         case(ALUControl)
-            // ADD without Carry
+            // ADD without Carry / CMN
             4'b0000:  
             begin
                 ALUResult_i <= S_wider[31:0] ;
+                C <= S_wider[32];
                 V <= ( Src_A[31] ~^ Src_B[31] )  & ( Src_B[31] ^ S_wider[31] );          
             end
-            // SUB without Carry
+            // SUB without Carry / CMP
             4'b0010:  
             begin
                 C_0[0] <= 1 ;  
                 Src_B_comp <= {1'b0, ~ Src_B} ;
                 ALUResult_i <= S_wider[31:0] ;
+                C <= S_wider[32];
                 V <= ( Src_A[31] ^ Src_B[31] )  & ( Src_B[31] ~^ S_wider[31] );       
             end
             // AND/TST
-            4'b0100: ALUResult_i <= Src_A & Src_B ;
+            4'b0100: 
+            begin
+                ALUResult_i <= Src_A & Src_B ;
+                C <= shifter_carry_out;
+            end
             // BIC
-            4'b0101: ALUResult_i <= Src_A & (~Src_B);
+            4'b0101: 
+            begin
+                ALUResult_i <= Src_A & (~Src_B);
+                C <= shifter_carry_out;
+            end
             // MOV
-            4'b1100: ALUResult_i <= Src_A;
+            4'b1100: 
+            begin
+                C <= shifter_carry_out;
+            end
             // MVN
-            4'b1101: ALUResult_i <= ~Src_A;
+            4'b1101: begin
+                ALUResult_i <= ~Src_B;
+                C <= shifter_carry_out;
+            end
             // ORR
-            4'b0110: ALUResult_i <= Src_A | Src_B ; 
+            4'b0110: 
+            begin
+                ALUResult_i <= Src_A | Src_B ; 
+                C <= shifter_carry_out;
+            end
             //EOR/TEQ
-            4'b1010: ALUResult_i <= Src_A ^ Src_B;
+            4'b1010: 
+            begin
+                ALUResult_i <= Src_A ^ Src_B;
+                C <= shifter_carry_out;
+            end
             // RSB with Carry
             4'b1001:
             begin
-                // C_0 = ~CFlag + 2
-                C_0[32] <= C_Flag;
-                C_0[0] <= ~C_Flag;
+                C_0[0] <= C_Flag;
                 Src_A_comp <= {1'b0, Src_B};
                 Src_B_comp <= {1'b0, ~Src_A};
                 ALUResult_i <= S_wider[31:0];
-                V <= (C_Flag) ? ( Src_B[31] ~^ ~Src_A[31] )  & ( ~Src_A[31] ^ S_wider[31] ) : ( Src_B[31] ^ Src_A[31] )  & ( Src_A[31] ~^ S_wider[31] );
+                C <= S_wider[32];
+                V <= ( Src_B[31] ^ Src_A[31] )  & ( Src_A[31] ~^ S_wider[31] );
             end              
         endcase ;
     end
     
     assign N = ALUResult_i[31] ;
     assign Z = (ALUResult_i == 0) ? 1 : 0 ;
-    assign C = S_wider[32] ;
     
     assign ALUResult = ALUResult_i ;
     assign ALUFlags = {N, Z, C, V} ;
