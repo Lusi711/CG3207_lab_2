@@ -36,7 +36,9 @@ module Shifter(
     input [1:0] Sh,
     input [4:0] Shamt5,
     input [31:0] ShIn,
-    output [31:0] ShOut
+    input C_Flag,
+    output [31:0] ShOut,
+    output shifter_carry_out
     );
       
     wire [31:0] ShTemp0 ;
@@ -44,14 +46,29 @@ module Shifter(
     wire [31:0] ShTemp2 ;
     wire [31:0] ShTemp3 ;
     wire [31:0] ShTemp4 ;
+    
+    reg shifterTempCarryIn;
+    wire shifterTempCarryOut1;
+    wire shifterTempCarryOut2;
+    wire shifterTempCarryOut3;
+    wire shifterTempCarryOut4;
                     
     assign ShTemp0 = ShIn ;
-    shiftByNPowerOf2#(0) shiftBy0PowerOf2( Sh, Shamt5[0], ShTemp0, ShTemp1 ) ;
-    shiftByNPowerOf2#(1) shiftBy1PowerOf2( Sh, Shamt5[1], ShTemp1, ShTemp2 ) ;
-    shiftByNPowerOf2#(2) shiftBy2PowerOf2( Sh, Shamt5[2], ShTemp2, ShTemp3 ) ;
-    shiftByNPowerOf2#(3) shiftBy3PowerOf2( Sh, Shamt5[3], ShTemp3, ShTemp4 ) ;
-    shiftByNPowerOf2#(4) shiftBy4PowerOf2( Sh, Shamt5[4], ShTemp4, ShOut ) ;
-
+    
+    always@(Shamt5, C_Flag, ShIn, shifterTempCarryIn) begin
+	   case(Sh)
+	       2'b00: shifterTempCarryIn <= C_Flag;
+	       2'b01: shifterTempCarryIn <= ShIn[31];
+	       2'b10: shifterTempCarryIn <= ShIn[31];
+	       2'b11: shifterTempCarryIn <= ShIn[0];
+       endcase
+	end
+	
+    shiftByNPowerOf2#(0) shiftBy0PowerOf2( Sh, Shamt5[0], ShTemp0, shifterTempCarryIn, ShTemp1, shifterTempCarryOut1) ;
+    shiftByNPowerOf2#(1) shiftBy1PowerOf2( Sh, Shamt5[1], ShTemp1, shifterTempCarryOut1, ShTemp2, shifterTempCarryOut2) ;
+    shiftByNPowerOf2#(2) shiftBy2PowerOf2( Sh, Shamt5[2], ShTemp2, shifterTempCarryOut2, ShTemp3, shifterTempCarryOut3 ) ;
+    shiftByNPowerOf2#(3) shiftBy3PowerOf2( Sh, Shamt5[3], ShTemp3, shifterTempCarryOut3, ShTemp4, shifterTempCarryOut4 ) ;
+    shiftByNPowerOf2#(4) shiftBy4PowerOf2( Sh, Shamt5[4], ShTemp4, shifterTempCarryOut4, ShOut, shifter_carry_out ) ;
 	
 endmodule
 
@@ -63,19 +80,35 @@ module shiftByNPowerOf2
         input [1:0] Sh,
         input flagShift,
         input [31:0] ShTempIn,
-        output reg [31:0] ShTempOut
+        input shifterTempCarryIn,
+        output reg [31:0] ShTempOut,
+        output reg shifterTempCarryOut
     ) ;
     
-    always@(Sh, ShTempIn, flagShift) begin
+    always@(Sh, ShTempIn, flagShift, shifterTempCarryIn, ShTempOut, shifterTempCarryOut) begin
         if(flagShift)
             case(Sh)
-                2'b00: ShTempOut <= { ShTempIn[31-2**i:0], {2**i{1'b0}} } ;      // LSL
-                2'b01: ShTempOut <= { {2**i{1'b0}}, ShTempIn[31:2**i] } ;        // LSR    
-                2'b10: ShTempOut <= { {2**i{ShTempIn[31]}}, ShTempIn[31:2**i] } ;   // ASR   
-                2'b11: ShTempOut <= { ShTempIn[2**i-1:0], ShTempIn[31:2**i] } ;  // ROR
+                2'b00: begin
+                    ShTempOut <= { ShTempIn[31-2**i:0], {2**i{1'b0}} } ; // LSL
+                    shifterTempCarryOut <= ShTempIn[32 - 2**i];
+                end
+                2'b01: begin
+                    ShTempOut <= { {2**i{1'b0}}, ShTempIn[31:2**i] } ; // LSR
+                    shifterTempCarryOut <= ShTempIn[2**i - 1];
+                end
+                2'b10: begin
+                    ShTempOut <= { {2**i{ShTempIn[31]}}, ShTempIn[31:2**i] } ; // ASR
+                    shifterTempCarryOut <= ShTempIn[2**i - 1];
+                end
+                2'b11: begin
+                    ShTempOut <= { ShTempIn[2**i-1:0], ShTempIn[31:2**i] } ; // ROR
+                    shifterTempCarryOut <= ShTempIn[2**i - 1];
+                end
             endcase   
-        else
+        else begin
             ShTempOut <= ShTempIn ;
+            shifterTempCarryOut <= shifterTempCarryIn;
+        end
     end
     
 endmodule
