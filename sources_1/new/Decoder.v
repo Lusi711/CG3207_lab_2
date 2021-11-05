@@ -46,7 +46,7 @@ module Decoder(
     output [1:0] RegSrc,
     output NoWrite,
     output reg [3:0] ALUControl,
-    output reg [1:0] FlagW,
+    output reg [2:0] FlagW,
     output Start,
     output reg [1:0] MCycleOp
     );
@@ -80,89 +80,89 @@ module Decoder(
             if (ALUOp == 2'b00) 
             begin
                 ALUControl = 4'b0000;
-                FlagW = 2'b00;
+                FlagW = 3'b000;
             end else if (ALUOp == 2'b01) 
             begin
                 ALUControl = 4'b0010;
-                FlagW = 2'b00;
+                FlagW = 3'b000;
             end else if (ALUOp == 2'b10) 
             begin
                 case(Funct[4:1])
                     // ADD
                     4'b0100: begin 
                         ALUControl = 4'b0000;
-                        FlagW = (Funct[0]) ? 2'b11 : 2'b00;
+                        FlagW = (Funct[0]) ? 3'b111 : 3'b000;
                     end
                     // SUB
                     4'b0010: begin
                         ALUControl = 4'b0010;
-                        FlagW = (Funct[0]) ? 2'b11 : 2'b00;
+                        FlagW = (Funct[0]) ? 3'b111 : 3'b000;
                     end
                     // AND
                     4'b0000: begin 
                         ALUControl = 4'b0100; 
-                        FlagW = (Funct[0]) ? 2'b10 : 2'b00;
+                        FlagW = (Funct[0]) ? 3'b110 : 3'b000;
                     end
                     // ORR
                     4'b1100: begin 
                         ALUControl = 4'b0110; 
-                        FlagW = (Funct[0]) ? 2'b10 : 2'b00;
+                        FlagW = (Funct[0]) ? 3'b110 : 3'b000;
                     end
                     // CMP
                     4'b1010: begin 
                         ALUControl = 4'b0010;
-                        FlagW = 2'b11;
+                        FlagW = 3'b111;
                     end
                     // CMN
                     4'b1011: begin 
                         ALUControl = 4'b0000;
-                        FlagW = 2'b11;
+                        FlagW = 3'b111;
                     end
                     // RSC
                     4'b0111: begin
                         ALUControl = 4'b1001;
-                        FlagW = (Funct[0]) ? 2'b11 : 2'b00;
+                        FlagW = (Funct[0]) ? 3'b111 : 3'b000;
                     end
                     // TST
                     4'b1000: begin
                         ALUControl = 4'b0100;
-                        FlagW = 2'b10;
+                        FlagW = 3'b110;
                     end
                     // TEQ
                     4'b1001: begin
                         ALUControl = 4'b1010;
-                        FlagW = 2'b10;
+                        FlagW = 3'b110;
                     end
                     // BIC
                     4'b1110: begin
                         ALUControl = 4'b0101; 
-                        FlagW = (Funct[0]) ? 2'b10 : 2'b00;
+                        FlagW = (Funct[0]) ? 3'b110 : 3'b000;
                     end
                     // MOV
                     4'b1101: begin
                         ALUControl = 4'b1100; 
-                        FlagW = (Funct[0]) ? 2'b10 : 2'b00;
+                        FlagW = (Funct[0]) ? 3'b110 : 3'b000;
                     end
                     // MVN
                     4'b1111: begin
                         ALUControl = 4'b1101; 
-                        FlagW = (Funct[0]) ? 2'b10 : 2'b00;
+                        FlagW = (Funct[0]) ? 3'b110 : 3'b000;
                     end
                     default: begin
                         ALUControl = 4'b1111; 
-                        FlagW = 2'b00;
+                        FlagW = 3'b000;
                     end
                 endcase
             end else 
             begin
                 ALUControl = 4'b1111;
-                FlagW = 2'b00;
+                FlagW = 3'b000;
             end
         end else // For MUL and DIV  updates Branch, MemtoReg, MemW, ALUSrc, ImmSrc[1:0], RegW, RegSrc[1:0], ALUOp[1:0]
         begin
             controls = 11'b0000XX10011;
             ALUControl = 4'b1111;
-            FlagW = (Funct[1:0] == 2'b01) ? 2'b10 : 2'b00;
+            FlagW = (Funct[1:0] == 2'b01) ? 3'b100 : 3'b000;
             MCycleOp = Funct[1] ? 2'b11 : 2'b01; // MUL if Funct[1] = 0, DIV if Funct[1] = 1
         end
     end

@@ -38,7 +38,7 @@ module CondLogic(
     input RegW,
     input NoWrite,
     input MemW,
-    input [1:0] FlagW,
+    input [2:0] FlagW,
     input [3:0] Cond,
     input [3:0] ALUFlags,
     output PCSrc,
@@ -50,25 +50,26 @@ module CondLogic(
     reg CondEx ;
     reg N = 0, Z = 0, C = 0, V = 0 ;
     //<extra signals, if any>
-    wire [1:0] FlagWrite;
+    wire [2:0] FlagWrite;
     
     assign C_Flag = C;
     assign FlagWrite[0] = FlagW[0] & CondEx;
     assign FlagWrite[1] = FlagW[1] & CondEx;
+    assign FlagWrite[2] = FlagW[2] & CondEx;
     // Set values of N, Z, C, V flags when required
     always @ (posedge CLK)
     begin
-        if (FlagWrite[1])
+        if (FlagWrite[2])
         begin
             N <= ALUFlags[3];
             Z <= ALUFlags[2];
         end
         
-        if (FlagWrite[0])
-        begin
+        if (FlagWrite[1])
             C <= ALUFlags[1];
+        
+        if (FlagWrite[0])
             V <= ALUFlags[0];
-        end
     end
     
     always@(Cond, N, Z, C, V)
