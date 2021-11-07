@@ -153,8 +153,8 @@ module ARM(
     assign WriteData = RD2;
     
     //Shifter Logic
-    assign Sh = (ShOp == 2'b00) ? 2'b11 : (ShOp == 2'b01) ? Instr[6:5] : 2'b00 ;
-    assign Shamt5 = (ShOp == 2'b00) ? { Instr[11:8], 1'b0 } : (ShOp == 2'b01) ? Instr[11:7] : 5'b0 ;
+    assign Sh = (ShOp[0]) ? Instr[6:5] : 2'b11 ;
+    assign Shamt5 = (ShOp[1]) ? 5'b0 : (ShOp[0]) ? Instr[11:7] : { Instr[11:8], 1'b0 } ;
     assign ShIn = ALUSrc ? ExtImm : RD2;
     
     // ALU Logic
@@ -226,7 +226,6 @@ module ARM(
                 
     // Instantiate Shifter        
     Shifter Shifter1(
-                    ShOp,
                     Sh,
                     Shamt5,
                     ShIn,
