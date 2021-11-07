@@ -87,6 +87,7 @@ module ARM(
     wire C_Flag;
        
     // Shifter signals
+    wire [1:0] ShOp ;
     wire [1:0] Sh ;
     wire [4:0] Shamt5 ;
     wire [31:0] ShIn ;
@@ -152,13 +153,13 @@ module ARM(
     assign WriteData = RD2;
     
     //Shifter Logic
-    assign ShIn = RD2;
-    assign Shamt5 = Instr[11:7];
     assign Sh = Instr[6:5];
+    assign Shamt5 = Instr[11:7];
+    assign ShIn = ALUSrc ? ExtImm : RD2;
     
     // ALU Logic
     assign Src_A = RD1;
-    assign Src_B = (ALUSrc == 1) ? ExtImm : ShOut;
+    assign Src_B = ShOut;
     
     // MCycle Logic
     assign Operand1 = RD1;
@@ -203,7 +204,8 @@ module ARM(
                     ALUControl,
                     FlagW,
                     Start,
-                    MCycleOp
+                    MCycleOp,
+                    ShOp
                 );
                                 
     // Instantiate CondLogic
@@ -224,6 +226,7 @@ module ARM(
                 
     // Instantiate Shifter        
     Shifter Shifter1(
+                    ShOp,
                     Sh,
                     Shamt5,
                     ShIn,
