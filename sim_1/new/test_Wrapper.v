@@ -61,7 +61,7 @@ module test_Wrapper #(
         wait(~CONSOLE_IN_ack);
         CONSOLE_IN_valid = 1'h0;
 		//insert rest of the stimuli here
-		*/
+		
 		// ADD FFFF to FFFF --> Display 0001 FFFE
 		DIP = 16'h0; PB = 3'h0; #150;
         DIP = 16'h0; PB = 3'h2; #60;
@@ -69,101 +69,94 @@ module test_Wrapper #(
         wait(SEVENSEGHEX);
         DIP = 16'h0; PB = 3'h1; #60;
         DIP = 16'hFFFF; PB = 3'h0;
-        wait(SEVENSEGHEX);
+        wait(SEVENSEGHEX == 32'h0000FFFF);
         wait(LED_OUT);
         wait(~LED_OUT);
         
-        //ADD 0001 to FFFF --> Display 0001 FFFF
-        DIP = 16'h0; PB = 3'h0; #150;
+        //ADD 0001 to FFFF --> Display 0001 0000 on SEVENSEGHEX and LED_OUT = 01
         DIP = 16'h0; PB = 3'h2; #60;
         DIP = 16'h0001; PB = 3'h0;
-        wait(SEVENSEGHEX);
+        wait(SEVENSEGHEX == 32'h1);
         DIP = 16'h0; PB = 3'h1; #60;
         DIP = 16'hFFFF; PB = 3'h0;
-        wait(SEVENSEGHEX);
+        wait(SEVENSEGHEX == 32'hFFFF);
         wait(LED_OUT);
         wait(~LED_OUT);
         
-        //ADD FFFF to 0001 --> Display 0001 FFFF
-        DIP = 16'h0; PB = 3'h0; #150;
+        //ADD FFFF to 0001 --> Display 0001 0000 and LED_OUT = 01
         DIP = 16'h0; PB = 3'h2; #60;
         DIP = 16'hFFFF; PB = 3'h0;
-        wait(SEVENSEGHEX);
+        wait(SEVENSEGHEX == 32'h0000FFFF);
         DIP = 16'h0; PB = 3'h1; #60;
         DIP = 16'h0001; PB = 3'h0;
-        wait(SEVENSEGHEX);
+        wait(SEVENSEGHEX == 32'h1);
         wait(LED_OUT);
         wait(~LED_OUT);
-        
-        // MULTIPLY FFFF to FFFF --> Display FFFE 0001
-        DIP = 16'h0; PB = 3'h0; #70;
+        */
+        // MULTIPLY FFFF to FFFF --> Display FFFE 0001 and LED_OUT = 02
         DIP = 16'h0; PB = 3'h2; #60;
         DIP = 16'hFFFF; PB = 3'h0;
-        wait(SEVENSEGHEX);
+        wait(SEVENSEGHEX == 32'h0000FFFF);
         DIP = 16'h0; PB = 3'h2; #60;
-        DIP = 16'hFFFF; PB = 3'h0; #100;
-        wait(SEVENSEGHEX);
+        DIP = 16'hFFFF; PB = 3'h0;
+        wait(SEVENSEGHEX == 32'h0000FFFF);
         wait(LED_OUT);
         wait(~LED_OUT);
         
-        // MULTIPLY 0001 to FFFF --> Display 0000 FFFF
-        DIP = 16'h0; PB = 3'h0; #70;
+        // MULTIPLY 0001 to FFFF --> Display 0000 FFFF and LED_OUT = 02
         DIP = 16'h0; PB = 3'h2; #60;
         DIP = 16'h0001; PB = 3'h0;
-        wait(SEVENSEGHEX);
-        DIP = 16'h0; PB = 3'h2; #60;
-        DIP = 16'hFFFF; PB = 3'h0; #100;
-        wait(SEVENSEGHEX);
-        wait(LED_OUT);
-        wait(~LED_OUT);
-        
-        // MULTIPLY FFFF to 0001 --> Display 0000 FFFF
-        DIP = 16'h0; PB = 3'h0; #70;
+        wait(SEVENSEGHEX == 32'h1);
         DIP = 16'h0; PB = 3'h2; #60;
         DIP = 16'hFFFF; PB = 3'h0;
-        wait(SEVENSEGHEX);
-        DIP = 16'h0; PB = 3'h2; #60;
-        DIP = 16'h0001; PB = 3'h0; #100;
-        wait(SEVENSEGHEX);
+        wait(SEVENSEGHEX == 32'h0000FFFF);
         wait(LED_OUT);
         wait(~LED_OUT);
         
-        // DIV FFFF from FFFF --> Display 0000 0001
-        DIP = 16'h0; PB = 3'h0; #70;
+        // MULTIPLY FFFF to 0001 --> Display 0000 FFFF and LED_OUT = 02
+        DIP = 16'h0; PB = 3'h2; #60;
+        DIP = 16'h0; PB = 3'h0;
+        wait(SEVENSEGHEX == 32'h0);
+        DIP = 16'hFFFF; PB = 3'h0;
+        wait(SEVENSEGHEX == 32'h0000FFFF);
+        DIP = 16'h0; PB = 3'h2; #60;
+        DIP = 16'h0001; PB = 3'h0;
+        wait(SEVENSEGHEX == 32'h1);
+        wait(LED_OUT);
+        wait(~LED_OUT);
+        
+        // DIV FFFF from FFFF --> Display 0000 0001 and LED_OUT = 04
         DIP = 16'h0; PB = 3'h2; #60;
         DIP = 16'hFFFF; PB = 3'h0; #60;
-        wait(SEVENSEGHEX);
+        wait(SEVENSEGHEX == 32'h0000FFFF);
         DIP = 16'h0; PB = 3'h4; #60;
-        DIP = 16'hFFFF; PB = 3'h0; #100;
-        DIP = 16'h0; PB = 3'h0;
-        wait(SEVENSEGHEX);
+        DIP = 16'hFFFF; PB = 3'h0;
+        wait(SEVENSEGHEX == 32'h0000FFFF);
+
         wait(LED_OUT);
         wait(~LED_OUT);
         
-        // DIV 0001 from FFFF --> Display 0000 0000
-        DIP = 16'h0; PB = 3'h0; #70;
+        // DIV 0001 from FFFF --> Display 0000 0000 and LED_OUT = 04
         DIP = 16'h0; PB = 3'h2; #60;
         DIP = 16'h0001; PB = 3'h0; #60;
-        wait(SEVENSEGHEX);
+        wait(SEVENSEGHEX == 32'h1);
         DIP = 16'h0; PB = 3'h4; #60;
-        DIP = 16'hFFFF; PB = 3'h0; #100;
-        DIP = 16'h0; PB = 3'h0;
-        wait(SEVENSEGHEX);
+        DIP = 16'hFFFF; PB = 3'h0;
+        wait(SEVENSEGHEX == 32'h0000FFFF);
         wait(LED_OUT);
         wait(~LED_OUT);
         
-        // DIV FFFF from 0001 --> Display 0000 FFFF
-        DIP = 16'h0; PB = 3'h0; #70;
+        // DIV FFFF from 0001 --> Display 0000 FFFF and LED_OUT = 04
         DIP = 16'h0; PB = 3'h2; #60;
         DIP = 16'hFFFF; PB = 3'h0; #60;
-        wait(SEVENSEGHEX);
+        wait(SEVENSEGHEX == 32'h0000FFFF);
         DIP = 16'h0; PB = 3'h4; #60;
-        DIP = 16'h0001; PB = 3'h0; #100;
-        DIP = 16'h0; PB = 3'h0;
-        wait(SEVENSEGHEX);
+        DIP = 16'h0001; PB = 3'h0;
+        wait(SEVENSEGHEX == 32'h1);
         wait(LED_OUT);
         wait(~LED_OUT);
     
+        DIP = 16'h0; PB = 3'h0;
     end
 	
 	// GENERATE CLOCK       
