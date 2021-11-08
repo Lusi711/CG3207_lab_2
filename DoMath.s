@@ -28,7 +28,7 @@ WAIT_DIP_1
 	LDR R2, [R7]			; read DIPS for 1st number
 	STR R2, [R9]			; show number on 7-Seg display
 	CMP R2, R5				; check that at least one DIP is on
-	BEQ WAIT_DIP_1				; go back and wait if no DIP is on
+	BEQ WAIT_DIP_1			; go back and wait if no DIP is on
 WAIT_DP
 	LDR R1, [R8]			; read button state for DP
 	STR R1, [R6]			; show button state on LEDs
