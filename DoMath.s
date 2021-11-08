@@ -15,61 +15,102 @@
 	  
 ; ------- <code memory (ROM mapped to Instruction Memory) begins>
 ; Total number of instructions should not exceed 127 (126 excluding the last line 'halt B halt').
-	
-	LDR R5, ZERO; 			; R5 stores the constant 0, which we need frequently as we do not have MOV implemented. Hence, something like MOV R1, #4 is accomplished by ADD R1, R6, #4
-	LDR R6, DIPS			; Address of DIPS
-	LDR R7, PBS				; Address of pushbuttons
-	LDR R8, SEVENSEG		; Address of seven segment display
+	LDR R6, LEDS			; Address of LEDs
+	LDR R7, DIPS			; Address of DIPS
+	LDR R8, PBS				; Address of pushbuttons
+	LDR R9, SEVENSEG		; Address of seven segment display
+	MOV R5, #0
 WAIT_START
-	STR R5, [R6, #-4]
-	LDR R1, [R6, #4]		; read button state
-	CMN R1, #0				; check for button press
+	LDR R1, [R8]			; read button state for START
+	CMN R1, R5				; check for button press
 	BEQ WAIT_START			; go back and wait if no button is pressed
 WAIT_DIP_1
-	LDR R2, [R6]
-	STR R2, [R8]			; show number on 7-Seg display
-	CMN R2, #0				; check that at least one DIP is turned on
-	BEQ WAIT_DIP_1			; wait for DIP
+	LDR R2, [R7]			; read DIPS for 1st number
+	STR R2, [R9]			; show number on 7-Seg display
+	CMP R2, R5				; check that at least one DIP is on
+	BEQ WAIT_DIP_1				; go back and wait if no DIP is on
 WAIT_DP
-	LDR R1, [R7]			; read button state for DP
-	CMN R1, #0				; check for button press
+	LDR R1, [R8]			; read button state for DP
+	STR R1, [R6]			; show button state on LEDs
+	TST R1, #0x03			; check for button press
 	BEQ WAIT_DP				; go back and wait if no button is pressed
 WAIT_DIP_2
-	LDR R3, [R6]
-	STR R3, [R8]			; show number on 7-Seg display
-	CMN R3, #0				; check that at least one DIP is turned on
+	LDR R3, [R7]
+	STR R3, [R9]			; show number on 7-Seg display
+	TEQ R3, R5				; check that at least one DIP is turned on
 	BEQ WAIT_DIP_2			; wait for DIP
 	
 ; Calculate the result and display
+	
 	CMP R1, #0x02
-	BMI ADDITION
-	BEQ MUL_LOGIC
-	BNE MLA_LOGIC
+	BMI NO_SHIFT
+	BEQ SHIFT
+	BNE MUL_MLA
 
-ADDITION
-	ADD R4, R2, R3
-	STR R4, [R8]			; 7-Seg shows the sum of R2 and R3
-	STR R1, [R6, #-4]		; LEDs indicate end of operation
+NO_SHIFT
+	ADDS R4, R2, R3			; R4 = R2 + R3
+	STR R4, [R9]			; 7-Seg shows the sum of R2 and R3
+	
+	ADC R4, R2, R3			; R4 = R2 + R3 + C
+	STR R4, [R9]
+	
+	SUBS R4, R2, R3			; R4 = R2 - R3
+	STR R4, [R9]
+	
+	SBC R4, R2, R3			; R4 = R2 - R3 - ~C
+	STR R4, [R9]
+	
+	RSBS R4, R2, R3			; R4 = R3 - R2
+	STR R4, [R9]
+	
+	RSC R4, R2, R3			; R4 = R3 - R2 - ~C
+	STR R4, [R9]
+	
+	AND R4, R2, R3			; R4 = R2 & R3
+	STR R4, [R9]
+	
+	ORR R4, R2, R3			; R4 = R2 | R3
+	STR R4, [R9]
+	
+	EOR R4, R2, R3			; R4 = R2 ^ R3
+	STR R4, [R9]
+	
+	STR R5, [R7, #-4]		; turn off all LEDs to indicate end of operation
+	
 	B WAIT_START
-LOGIC_OR
-	ORR R4, R2, R3
-	STR R4, [R8]			; 7-Seg shows (R2 BITWISE OR R3)
-	STR R1, [R6, #-4]		; LEDs indicate end of operation
-	B WAIT_START
+
 SHIFT
-	ADD R4, R2, R3, LSR #8	
-	STR R4, [R8]			; 7-Seg shows (R2 + (R3 >> 8))
-	STR R1, [R6, #-4]		; LEDs indicate end of operation
+	ADD R4, R2, R3, LSL #2	; R4 = R2 + (R3 >> 2)
+	STR R4, [R9]			; 7-Seg shows the sum of R2 and R3
+	
+	SUB R4, R2, R3, LSR #2	; R4 = R2 - (R3 >> 2)
+	STR R4, [R9]
+	
+	AND R4, R2, R3, ASR #2	; R4 = R2 & (R3 >> 2)
+	STR R4, [R9]
+	
+	ORR R4, R2, R3, ROR #2	; R4 = R2 | (R3 >> 2)
+	STR R4, [R9]
+	
+	RSB R4, R2, R3			; R4 = R3 - (R2 >> 2)
+	STR R4, [R9]
+	
+	EOR R4, R2, R3			; R4 = R2 ^ (R3 >> 2)
+	STR R4, [R9]
+	
+	STR R5, [R7, #-4]		; turn off all LEDS to indicate end of operation
+	
 	B WAIT_START
-MLA_LOGIC
-	MLA R4, R2, R3, R9		; Replaces DIV operation in ARMv3
-	STR R4, [R8]			; 7-Seg shows quotient of R2 / R3
-	STR R1, [R6, #-4]		; LEDs indicate end of operation
-	B WAIT_START
-MUL_LOGIC
-	MUL R4, R2, R3			
+
+MUL_MLA
+	MUL R4, R2, R3			; R4 = R2 * R3			
 	STR R4, [R8]			; 7-Seg shows (R2 * R3)
-	STR R1, [R6, #-4]		; LEDs indicate end of operation
+	
+	MLA R4, R2, R3, R9		; R4 = R2 / R3
+	STR R4, [R8]			; 7-Seg shows quotient of R2 / R3
+	
+	STR R1, [R7, #-4]		; Turn off all LEDS to indicate end of operation
+	
 	B WAIT_START
 
 halt
@@ -134,4 +175,4 @@ variable1
 		
 ;const int* x;         // x is a non-constant pointer to constant data
 ;int const* x;         // x is a non-constant pointer to constant data 
-;int*const x;          // x is a constant pointer to non-constant dat
+;int*const x;          // x is a constant pointer to non-constant data
