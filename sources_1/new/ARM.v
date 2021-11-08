@@ -226,6 +226,7 @@ module ARM(
                 
     // Instantiate Shifter        
     Shifter Shifter1(
+                    ShOp,
                     Sh,
                     Shamt5,
                     ShIn,

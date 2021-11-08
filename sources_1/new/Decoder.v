@@ -175,6 +175,7 @@ module Decoder(
                 ALUControl = 4'b1111;
                 FlagW = 3'b000;
             end
+            MCycleOp = 2'bx; // to prevent inferred latch
         end else // For MUL and DIV  updates Branch, MemtoReg, MemW, ALUSrc, ImmSrc[1:0], RegW, RegSrc[1:0], ALUOp[1:0]
         begin
             controls = 13'b0000XX100111X;

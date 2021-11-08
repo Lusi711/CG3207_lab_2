@@ -53,43 +53,40 @@ module ALU(
         Src_A_comp <= {1'b0, Src_A} ;
         Src_B_comp <= {1'b0, Src_B} ;
         ALUResult_i <= Src_B ;
+        C <= S_wider[32] ;
         V <= 0 ;
     
         case(ALUControl)
-            // ADD without Carry / CMN
+            // ADD / CMN
             4'b0000:  
             begin
                 ALUResult_i <= S_wider[31:0] ;
-                C <= S_wider[32];
                 V <= ( Src_A[31] ~^ Src_B[31] ) & ( Src_B[31] ^ S_wider[31] );          
             end
-            // ADD with Carry / ADC
+            // ADC
             4'b0001:  
             begin
                 C_0 <= C_Flag;
                 ALUResult_i <= S_wider[31:0] ;
-                C <= S_wider[32];
                 V <= ( Src_A[31] ~^ Src_B[31] ) & ( Src_B[31] ^ S_wider[31] );          
             end
-            // SUB without Carry / CMP
+            // SUB / CMP
             4'b0010:  
             begin
                 C_0[0] <= 1;  
                 Src_B_comp <= {1'b0, ~ Src_B} ;
                 ALUResult_i <= S_wider[31:0] ;
-                C <= S_wider[32];
                 V <= ( Src_A[31] ^ Src_B[31] ) & ( Src_B[31] ~^ S_wider[31] );       
             end
-            // SUB with Carry / SBC
+            // SBC
             4'b0011:  
             begin
                 C_0[0] <= C_Flag ;  
                 Src_B_comp <= {1'b0, ~ Src_B} ;
                 ALUResult_i <= S_wider[31:0] ;
-                C <= S_wider[32];
                 V <= ( Src_A[31] ^ Src_B[31] ) & ( Src_B[31] ~^ S_wider[31] );     
             end
-            // AND/TST
+            // AND / TST
             4'b0100: 
             begin
                 ALUResult_i <= Src_A & Src_B ;
@@ -99,6 +96,36 @@ module ALU(
             4'b0101: 
             begin
                 ALUResult_i <= Src_A & (~Src_B);
+                C <= shifter_carry_out;
+            end
+            // ORR
+            4'b0110: 
+            begin
+                ALUResult_i <= Src_A | Src_B ; 
+                C <= shifter_carry_out;
+            end
+            // RSB
+            4'b1000: 
+            begin
+                C_0[0] <= 1 ;  
+                Src_A_comp <= {1'b0, Src_B};
+                Src_B_comp <= {1'b0, ~Src_A};
+                ALUResult_i <= S_wider[31:0];
+                V <= ( Src_B[31] ^ Src_A[31] ) & ( Src_A[31] ~^ S_wider[31] );
+            end
+            // RSC
+            4'b1001:
+            begin
+                C_0[0] <= C_Flag;
+                Src_A_comp <= {1'b0, Src_B};
+                Src_B_comp <= {1'b0, ~Src_A};
+                ALUResult_i <= S_wider[31:0];
+                V <= ( Src_B[31] ^ Src_A[31] ) & ( Src_A[31] ~^ S_wider[31] );
+            end
+            // EOR / TEQ
+            4'b1010: 
+            begin
+                ALUResult_i <= Src_A ^ Src_B;
                 C <= shifter_carry_out;
             end
             // MOV
@@ -112,38 +139,6 @@ module ALU(
                 ALUResult_i <= ~Src_B;
                 C <= shifter_carry_out;
             end
-            // ORR
-            4'b0110: 
-            begin
-                ALUResult_i <= Src_A | Src_B ; 
-                C <= shifter_carry_out;
-            end
-            // EOR/TEQ
-            4'b1010: 
-            begin
-                ALUResult_i <= Src_A ^ Src_B;
-                C <= shifter_carry_out;
-            end
-            // RSB
-            4'b1000: 
-            begin
-                C_0[0] <= 1 ;  
-                Src_A_comp <= {1'b0, Src_B};
-                Src_B_comp <= {1'b0, ~Src_A};
-                ALUResult_i <= S_wider[31:0];
-                C <= S_wider[32];
-                V <= ( Src_B[31] ^ Src_A[31] ) & ( Src_A[31] ~^ S_wider[31] );
-            end
-            // RSB with Carry (RSC)
-            4'b1001:
-            begin
-                C_0[0] <= C_Flag;
-                Src_A_comp <= {1'b0, Src_B};
-                Src_B_comp <= {1'b0, ~Src_A};
-                ALUResult_i <= S_wider[31:0];
-                C <= S_wider[32];
-                V <= ( Src_B[31] ^ Src_A[31] ) & ( Src_A[31] ~^ S_wider[31] );
-            end              
         endcase ;
     end
     
