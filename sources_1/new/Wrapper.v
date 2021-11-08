@@ -86,6 +86,7 @@ reg [31:0] DATA_CONST_MEM	[0:127]; // data (constant) memory
 reg [31:0] DATA_VAR_MEM     [0:127]; // data (variable) memory
 reg [8:0] i, j;
 
+
 //----------------------------------------------------------------
 // Instruction Memory
 //----------------------------------------------------------------
@@ -96,8 +97,8 @@ initial begin
 			INSTR_MEM[3] = 32'hE59F9204; 
 			INSTR_MEM[4] = 32'hE3A05000; 
 			INSTR_MEM[5] = 32'hE5981000; 
-			INSTR_MEM[6] = 32'hE1710005; 
-			INSTR_MEM[7] = 32'hE5861000; 
+			INSTR_MEM[6] = 32'hE5861000; 
+			INSTR_MEM[7] = 32'hE1710005; 
 			INSTR_MEM[8] = 32'h0AFFFFFB; 
 			INSTR_MEM[9] = 32'hE5972000; 
 			INSTR_MEM[10] = 32'hE5892000; 
@@ -106,7 +107,7 @@ initial begin
 			INSTR_MEM[13] = 32'hE5865000; 
 			INSTR_MEM[14] = 32'hE5981000; 
 			INSTR_MEM[15] = 32'hE5861000; 
-			INSTR_MEM[16] = 32'hE3110003; 
+			INSTR_MEM[16] = 32'hE3110007; 
 			INSTR_MEM[17] = 32'h0AFFFFFA; 
 			INSTR_MEM[18] = 32'hE5973000; 
 			INSTR_MEM[19] = 32'hE5893000; 
@@ -114,8 +115,8 @@ initial begin
 			INSTR_MEM[21] = 32'h0AFFFFFB; 
 			INSTR_MEM[22] = 32'hE3510002; 
 			INSTR_MEM[23] = 32'h4A000001; 
-			INSTR_MEM[24] = 32'h0A000014; 
-			INSTR_MEM[25] = 32'h1A000021; 
+			INSTR_MEM[24] = 32'h0A000016; 
+			INSTR_MEM[25] = 32'h1A00001F; 
 			INSTR_MEM[26] = 32'hE0924003; 
 			INSTR_MEM[27] = 32'hE5894000; 
 			INSTR_MEM[28] = 32'hE0A24003; 
@@ -134,30 +135,32 @@ initial begin
 			INSTR_MEM[41] = 32'hE5894000; 
 			INSTR_MEM[42] = 32'hE0224003; 
 			INSTR_MEM[43] = 32'hE5894000; 
-			INSTR_MEM[44] = 32'hE5075004; 
-			INSTR_MEM[45] = 32'hEAFFFFD6; 
-			INSTR_MEM[46] = 32'hE0824103; 
-			INSTR_MEM[47] = 32'hE5894000; 
-			INSTR_MEM[48] = 32'hE0424123; 
+			INSTR_MEM[44] = 32'hE1C24003; 
+			INSTR_MEM[45] = 32'hE5894000; 
+			INSTR_MEM[46] = 32'hE5075004; 
+			INSTR_MEM[47] = 32'hEAFFFFD4; 
+			INSTR_MEM[48] = 32'hE0824103; 
 			INSTR_MEM[49] = 32'hE5894000; 
-			INSTR_MEM[50] = 32'hE0024143; 
+			INSTR_MEM[50] = 32'hE0424123; 
 			INSTR_MEM[51] = 32'hE5894000; 
-			INSTR_MEM[52] = 32'hE1824163; 
+			INSTR_MEM[52] = 32'hE0624143; 
 			INSTR_MEM[53] = 32'hE5894000; 
-			INSTR_MEM[54] = 32'hE0624003; 
+			INSTR_MEM[54] = 32'hE1C24163; 
 			INSTR_MEM[55] = 32'hE5894000; 
-			INSTR_MEM[56] = 32'hE0224003; 
-			INSTR_MEM[57] = 32'hE5894000; 
-			INSTR_MEM[58] = 32'hE5075004; 
-			INSTR_MEM[59] = 32'hEAFFFFC8; 
-			INSTR_MEM[60] = 32'hE0040392; 
-			INSTR_MEM[61] = 32'hE5884000; 
-			INSTR_MEM[62] = 32'hE0249392; 
-			INSTR_MEM[63] = 32'hE5884000; 
-			INSTR_MEM[64] = 32'hE5071004; 
-			INSTR_MEM[65] = 32'hEAFFFFC2; 
-			INSTR_MEM[66] = 32'hEAFFFFFE; 
-			for(i = 67; i < 128; i = i+1) begin 
+			INSTR_MEM[56] = 32'hE5075004; 
+			INSTR_MEM[57] = 32'hEAFFFFCA; 
+			INSTR_MEM[58] = 32'hE0024103; 
+			INSTR_MEM[59] = 32'hE5894000; 
+			INSTR_MEM[60] = 32'hE1824123; 
+			INSTR_MEM[61] = 32'hE5894000; 
+			INSTR_MEM[62] = 32'hE0224143; 
+			INSTR_MEM[63] = 32'hE5894000; 
+			INSTR_MEM[64] = 32'hE1C24163; 
+			INSTR_MEM[65] = 32'hE5894000; 
+			INSTR_MEM[66] = 32'hE5071004; 
+			INSTR_MEM[67] = 32'hEAFFFFC0; 
+			INSTR_MEM[68] = 32'hEAFFFFFE; 
+			for(i = 69; i < 128; i = i+1) begin 
 				INSTR_MEM[i] = 32'h0; 
 			end
 end
