@@ -34,7 +34,7 @@ WAIT_DP
 	STR R5, [R6]			; Initialize LEDs
 	LDR R1, [R8]			; read button state for DP
 	STR R1, [R6]			; show button state on LEDs
-	TST R1, #0x03			; check for button press
+	TST R1, #0x07			; check for button press
 	BEQ WAIT_DP				; go back and wait if no button is pressed
 WAIT_DIP_2
 	LDR R3, [R7]
@@ -77,39 +77,42 @@ NO_SHIFT
 	EOR R4, R2, R3			; R4 = R2 ^ R3
 	STR R4, [R9]
 	
+	BIC R4, R2, R3			; R4 = R2 & ~R3
+	STR R4, [R9]
+	
 	STR R5, [R7, #-4]		; turn off all LEDs to indicate end of operation
 	
 	B WAIT_START
 
-SHIFT
+SHIFT_ADD_SUB
 	ADD R4, R2, R3, LSL #2	; R4 = R2 + (R3 >> 2)
 	STR R4, [R9]			; 7-Seg shows the sum of R2 and R3
 	
 	SUB R4, R2, R3, LSR #2	; R4 = R2 - (R3 >> 2)
 	STR R4, [R9]
 	
-	AND R4, R2, R3, ASR #2	; R4 = R2 & (R3 >> 2)
+	RSB R4, R2, R3, ASR #2	; R4 = R3 - (R2 >> 2)
 	STR R4, [R9]
 	
-	ORR R4, R2, R3, ROR #2	; R4 = R2 | (R3 >> 2)
-	STR R4, [R9]
-	
-	RSB R4, R2, R3			; R4 = R3 - (R2 >> 2)
-	STR R4, [R9]
-	
-	EOR R4, R2, R3			; R4 = R2 ^ (R3 >> 2)
+	BIC R4, R2, R3, ROR #2	; R4 = R2 & ~R3
 	STR R4, [R9]
 	
 	STR R5, [R7, #-4]		; turn off all LEDS to indicate end of operation
 	
 	B WAIT_START
 
-MUL_MLA
-	MUL R4, R2, R3			; R4 = R2 * R3			
-	STR R4, [R8]			; 7-Seg shows (R2 * R3)
+SHIFT_LOGICAL
+	AND R4, R2, R3, LSL #2	; R4 = R2 & (R3 >> 2)
+	STR R4, [R9]
 	
-	MLA R4, R2, R3, R9		; R4 = R2 / R3
-	STR R4, [R8]			; 7-Seg shows quotient of R2 / R3
+	ORR R4, R2, R3, LSR #2	; R4 = R2 | (R3 >> 2)
+	STR R4, [R9]
+	
+	EOR R4, R2, R3, ASR #2	; R4 = R2 ^ (R3 >> 2)
+	STR R4, [R9]
+	
+	BIC R4, R2, R3, ROR #2	; R4 = R2 & ~R3
+	STR R4, [R9]
 	
 	STR R1, [R7, #-4]		; Turn off all LEDS to indicate end of operation
 	
