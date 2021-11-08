@@ -229,7 +229,6 @@ module ARM(
                     Sh,
                     Shamt5,
                     ShIn,
-                    C_Flag,
                     ShOut,
                     shifter_carry_out
                 );

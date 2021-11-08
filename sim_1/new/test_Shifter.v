@@ -25,70 +25,51 @@ module test_Shifter(
     );
     
     // DECLARE INPUT SIGNALS
+    reg [1:0] ShOp;
     reg [1:0] Sh;
     reg [4:0] Shamt5;
     reg [31:0] ShIn;
-    reg C_Flag;
     
     // DECLARE OUTPUT SIGNALS
     wire [31:0] ShOut;
     wire shifter_carry_out;
     
     // INSTANTIATE DEVICE/UNIT UNDER TEST (DUT/UUT)
-    Shifter dut(Sh, Shamt5, ShIn, C_Flag, ShOut, shifter_carry_out);
+    Shifter dut(ShOp, Sh, Shamt5, ShIn, ShOut, shifter_carry_out);
     
     // STIMULI
     initial begin
         // DP Rd, Rn, #0FF0
-        Sh = 2'b11; Shamt5 = 5'b11101; ShIn = 32'hFF; C_Flag = 0; #20;
-        Sh = 2'b11; Shamt5 = 5'b11101; ShIn = 32'hFF; C_Flag = 1; #20;
-        
+        ShOp = 2'b00; Sh = 2'b11; Shamt5 = 5'b11100; ShIn = 32'hFF; #20;
         // DP Rd, Rn, Rm, LSL #2
-        Sh = 2'b00; Shamt5 = 5'b00010; ShIn = 32'hFFFFFFFF; C_Flag = 0; #20;
-        Sh = 2'b00; Shamt5 = 5'b00010; ShIn = 32'hFFFFFFFF; C_Flag = 1; #20;
-        Sh = 2'b00; Shamt5 = 5'b00010; ShIn = 32'h0; C_Flag = 0; #20;
-        Sh = 2'b00; Shamt5 = 5'b00010; ShIn = 32'h0; C_Flag = 1; #20;
-        Sh = 2'b00; Shamt5 = 5'b00010; ShIn = 32'h1; C_Flag = 0; #20;
-        Sh = 2'b00; Shamt5 = 5'b00010; ShIn = 32'h1; C_Flag = 1; #20;
+        ShOp = 2'b01; Sh = 2'b00; Shamt5 = 5'b00010; ShIn = 32'hFFFFFFFF; #20;
+        ShOp = 2'b01; Sh = 2'b00; Shamt5 = 5'b00010; ShIn = 32'h0; #20;
+        ShOp = 2'b01; Sh = 2'b00; Shamt5 = 5'b00010; ShIn = 32'h1; #20;
         // DP Rd, Rn, Rm, LSR #2
-        Sh = 2'b01; Shamt5 = 5'b00010; ShIn = 32'hFFFFFFFF; C_Flag = 1'b0; #20;
-        Sh = 2'b01; Shamt5 = 5'b00010; ShIn = 32'hFFFFFFFF; C_Flag = 1'b1; #20;
-        Sh = 2'b01; Shamt5 = 5'b00010; ShIn = 32'h0; C_Flag = 0; #20;
-        Sh = 2'b01; Shamt5 = 5'b00010; ShIn = 32'h0; C_Flag = 1; #20;
-        Sh = 2'b01; Shamt5 = 5'b00010; ShIn = 32'h1; C_Flag = 0; #20;
-        Sh = 2'b01; Shamt5 = 5'b00010; ShIn = 32'h1; C_Flag = 1; #20;
+        ShOp = 2'b01; Sh = 2'b01; Shamt5 = 5'b00010; ShIn = 32'hFFFFFFFF; #20;
+        ShOp = 2'b01; Sh = 2'b01; Shamt5 = 5'b00010; ShIn = 32'h0; #20;
+        ShOp = 2'b01; Sh = 2'b01; Shamt5 = 5'b00010; ShIn = 32'h1; #20;
         // DP Rd, Rn, Rm, ASR #2
-        Sh = 2'b10; Shamt5 = 5'b00010; ShIn = 32'hFFFFFFFF; C_Flag = 0; #20;
-        Sh = 2'b10; Shamt5 = 5'b00010; ShIn = 32'hFFFFFFFF; C_Flag = 1; #20;
-        Sh = 2'b10; Shamt5 = 5'b00010; ShIn = 32'h0; C_Flag = 0; #20;
-        Sh = 2'b10; Shamt5 = 5'b00010; ShIn = 32'h0; C_Flag = 1; #20;
-        Sh = 2'b10; Shamt5 = 5'b00010; ShIn = 32'h1; C_Flag = 0; #20;
-        Sh = 2'b10; Shamt5 = 5'b00010; ShIn = 32'h1; C_Flag = 1; #20;
+        ShOp = 2'b01; Sh = 2'b10; Shamt5 = 5'b00010; ShIn = 32'hFFFFFFFF; #20;
+        ShOp = 2'b01; Sh = 2'b10; Shamt5 = 5'b00010; ShIn = 32'h0; #20;
+        ShOp = 2'b01; Sh = 2'b10; Shamt5 = 5'b00010; ShIn = 32'h1; #20;
         // DP Rd, Rn, Rm, ROR #2
-        Sh = 2'b11; Shamt5 = 5'b00010; ShIn = 32'hFFFFFFFF; C_Flag = 0; #20;
-        Sh = 2'b11; Shamt5 = 5'b00010; ShIn = 32'hFFFFFFFF; C_Flag = 1; #20;
-        Sh = 2'b11; Shamt5 = 5'b00010; ShIn = 32'h0; C_Flag = 0; #20;
-        Sh = 2'b11; Shamt5 = 5'b00010; ShIn = 32'h0; C_Flag = 1; #20;
-        Sh = 2'b11; Shamt5 = 5'b00010; ShIn = 32'h1; C_Flag = 0; #20;
-        Sh = 2'b11; Shamt5 = 5'b00010; ShIn = 32'h1; C_Flag = 1; #20;
+        ShOp = 2'b01; Sh = 2'b11; Shamt5 = 5'b00010; ShIn = 32'hFFFFFFFF; #20;
+        ShOp = 2'b01; Sh = 2'b11; Shamt5 = 5'b00010; ShIn = 32'h0; #20;
+        ShOp = 2'b01; Sh = 2'b11; Shamt5 = 5'b00010; ShIn = 32'h1; #20;
         
         // MUL/MLA(DIV) Rd, Rm, Rs
-        Sh = 2'b00; Shamt5 = 5'b0; ShIn = 32'hFFFFFFFF; C_Flag = 0; #20;
-        Sh = 2'b00; Shamt5 = 5'b0; ShIn = 32'hFFFFFFFF; C_Flag = 1; #20;
-        Sh = 2'b00; Shamt5 = 5'b0; ShIn = 32'h0; C_Flag = 0; #20;
-        Sh = 2'b00; Shamt5 = 5'b0; ShIn = 32'h0; C_Flag = 1; #20;
-        Sh = 2'b00; Shamt5 = 5'b0; ShIn = 32'h1; C_Flag = 0; #20;
-        Sh = 2'b00; Shamt5 = 5'b0; ShIn = 32'h1; C_Flag = 1; #20;
+        ShOp = 2'b1X; Sh = 2'b00; Shamt5 = 5'b0; ShIn = 32'hFFFFFFFF; #20;
+        ShOp = 2'b1X; Sh = 2'b00; Shamt5 = 5'b0; ShIn = 32'h0; #20;
+        ShOp = 2'b1X; Sh = 2'b00; Shamt5 = 5'b0; ShIn = 32'h1; #20;
         
         // LDR/STR Rd, [Rn, #Imm12]
-        Sh = 2'b00; Shamt5 = 5'b0; ShIn = 32'h1A; C_Flag = 0; #20;
-        Sh = 2'b00; Shamt5 = 5'b0; ShIn = 32'h1A; C_Flag = 1; #20;
+        ShOp = 2'b10; Sh = 2'b00; Shamt5 = 5'b0; ShIn = 32'h1A; #20;
         
         // B #-6
-        Sh = 2'b11; Shamt5 = 5'b11111; ShIn = 32'hFFFFFFE8; C_Flag = 0; #20;
-        Sh = 2'b11; Shamt5 = 5'b11111; ShIn = 32'hFFFFFFE8; C_Flag = 1; #20;
+        ShOp = 2'b1X; Sh = 2'b11; Shamt5 = 5'b0; ShIn = 32'hFFFFFFE8; #20;
         
         //End of operation
-        Sh = 2'b00; Shamt5 = 5'b00000; ShIn = 32'h0; C_Flag = 1'b0;
-    end
+        ShOp = 2'b00; Sh = 2'b00; Shamt5 = 5'b00000; ShIn = 32'h0;
+     end
 endmodule

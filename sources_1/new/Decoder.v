@@ -69,7 +69,7 @@ module Decoder(
             case(Op)
                 2'b00: controls = (Funct[5]) ? 13'b0001001x01000 : 13'b0000xx1001001 ; // DP Imm : DP Reg
                 2'b01: controls = (Funct[0]) ? { 10'b0101011x00, ~Funct[3], ~Funct[5], Funct[5] } : { 10'b0x11010100, ~Funct[3], ~Funct[5], Funct[5] } ;  // LDR : STR
-                2'b10: controls = 13'b1001100x10010 ;   // B
+                2'b10: controls = 13'b1001100x1001X ;   // B
                 default: controls = 13'bx ;
             endcase
             
