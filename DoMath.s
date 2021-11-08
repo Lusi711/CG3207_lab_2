@@ -15,8 +15,9 @@
 	  
 ; ------- <code memory (ROM mapped to Instruction Memory) begins>
 ; Total number of instructions should not exceed 127 (126 excluding the last line 'halt B halt').
-	
-	LDR R5, ZERO; 			; R5 stores the constant 0, which we need frequently as we do not have MOV implemented. Hence, something like MOV R1, #4 is accomplished by ADD R1, R6, #4
+
+; This sample program prints "Welcome to CG3207" in response to press of button. There should be sufficient time gap between the press of buttons.
+	LDR R5, ZERO; 			; R5 stores the constant 0, which we need frequently as we do not have MOV implemented. Hence, something like MOV R1, #4 is accomplished by ADD R1, R6, #4	
 	LDR R6, DIPS			; Address of DIPS
 	LDR R7, PBS				; Address of pushbuttons
 	LDR R8, SEVENSEG		; Address of seven segment display
@@ -40,6 +41,39 @@ WAIT_DIP_2
 	CMN R3, #0				; check that at least one DIP is turned on
 	BEQ WAIT_DIP_2			; wait for DIP
 	
+
+	
+WAIT_DP_2
+	LDR R1, [R7]			; first operand
+	CMN R1, #0				; check for button press
+	BEQ WAIT_DP_2				; go back and wait if no button is pressed
+WAIT_DIP_3
+	LDR R0, [R6]
+	STR R0, [R8]			; show number on 7-Seg display
+	CMN R0, #0				; check that at least one DIP is turned on
+	BEQ WAIT_DIP_3			; wait for DIP
+	
+WAIT_DP_3
+	LDR R1, [R7]			; second operand
+	CMN R1, #0				; check for button press
+	BEQ WAIT_DP_3				; go back and wait if no button is pressed
+WAIT_DIP_4
+	LDR R11, [R6]
+	STR R11, [R8]			; show number on 7-Seg display
+	CMN R11, #0				; check that at least one DIP is turned on
+	BEQ WAIT_DIP_4			; wait for DIP
+WAIT_DP_4
+	LDR R1, [R7]			; third operand
+	CMN R1, #0				; check for button press
+	BEQ WAIT_DP_4				; go back and wait if no button is pressed
+WAIT_DIP_5
+	LDR R10, [R6]
+	STR R10, [R8]			; show number on 7-Seg display
+	CMN R10, #0				; check that at least one DIP is turned on
+	BEQ WAIT_DIP_5			; wait for DIP
+
+
+
 ; Calculate the result and display
 	CMP R1, #0x02
 	BMI ADDITION
@@ -71,11 +105,56 @@ MUL_LOGIC
 	STR R4, [R8]			; 7-Seg shows (R2 * R3)
 	STR R1, [R6, #-4]		; LEDs indicate end of operation
 	B WAIT_START
+ADDWITHCARRY
+	ADC R4, R0, R11			
+	STR R4, [R8]			; 
+	STR R1, [R6, #-4]		; LEDs indicate end of operation
+	B WAIT_START
+LOGICAL_AND
+	AND R4, R0, R11			
+	STR R4, [R8]			; 
+	STR R1, [R6, #-4]		; LEDs indicate end of operation
+	B WAIT_START
+LOGICAL_XOR
+	EOR R4, R0, R11			
+	STR R4, [R8]			; 
+	STR R1, [R6, #-4]		; LEDs indicate end of operation
+	B WAIT_START
+SUBTRACT
+	SUB R4, R0, R11			
+	STR R4, [R8]			; 
+	STR R1, [R6, #-4]		; LEDs indicate end of operation
+	B WAIT_START
+REVERSE_SUBTRACT
+	RSB R4, R11, R0			
+	STR R4, [R8]			; 
+	STR R1, [R6, #-4]		; LEDs indicate end of operation
+	B WAIT_START
+SUBTRACT_CARRY
+	SBC R4, R0, R11			
+	STR R4, [R8]			; 
+	STR R1, [R6, #-4]		; LEDs indicate end of operation
+	B WAIT_START
+REVERSE_SUBTRACT_CARRY
+	RSC R4, R11, R0			
+	STR R4, [R8]			;
+	STR R1, [R6, #-4]		; LEDs indicate end of operation
+	B WAIT_START
+TEST
+	TST R0, R11			
+	STR R0, [R8]			; 
+	STR R1, [R6, #-4]		; LEDs indicate end of operation
+	B WAIT_START
+TEST_EQUIVALENCE
+	TEQ R0, R11			
+	STR R0, [R8]			; 
+	STR R1, [R6, #-4]		; LEDs indicate end of operation
+	B WAIT_START
 
 halt
 	B    halt				; infinite loop to halt computation. // A program should not "terminate" without an operating system to return control to
 							; keep halt	B halt as the last line of your code.
-							
+
 ; ------- <\code memory (ROM mapped to Instruction Memory) ends>
 
 
@@ -134,4 +213,4 @@ variable1
 		
 ;const int* x;         // x is a non-constant pointer to constant data
 ;int const* x;         // x is a non-constant pointer to constant data 
-;int*const x;          // x is a constant pointer to non-constant dat
+;int*const x;          // x is a constant pointer to non-constant data
