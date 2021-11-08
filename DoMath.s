@@ -23,6 +23,7 @@
 WAIT_START
 	LDR R1, [R8]			; read button state for START
 	CMN R1, R5				; check for button press
+	STR R1, [R6]			; show button state on LEDs
 	BEQ WAIT_START			; go back and wait if no button is pressed
 WAIT_DIP_1
 	LDR R2, [R7]			; read DIPS for 1st number
@@ -30,6 +31,7 @@ WAIT_DIP_1
 	CMP R2, R5				; check that at least one DIP is on
 	BEQ WAIT_DIP_1			; go back and wait if no DIP is on
 WAIT_DP
+	STR R5, [R6]			; Initialize LEDs
 	LDR R1, [R8]			; read button state for DP
 	STR R1, [R6]			; show button state on LEDs
 	TST R1, #0x03			; check for button press
