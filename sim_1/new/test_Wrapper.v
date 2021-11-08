@@ -95,101 +95,101 @@ module test_Wrapper #(
         */
         // FFFF to FFFF
         DIP = 16'h0; PB = 3'h2;
-        wait(SEVENSEGHEX == 32'h0);
+        wait(LED_OUT);
         DIP = 16'hFFFF; PB = 3'h0;
         wait(SEVENSEGHEX == 32'h0000FFFF);
         DIP = 16'h0; PB = 3'h1;
-        wait(LED_OUT);
+        wait(SEVENSEGHEX == 32'h0);
         DIP = 16'hFFFF; PB = 3'h0;
         wait(SEVENSEGHEX == 32'h0000FFFF);
         wait(LED_OUT == 0);
         
         // 0001 to FFFF
         DIP = 16'h0; PB = 3'h2;
-        wait(SEVENSEGHEX == 32'h0);
+        wait(LED_OUT);
         DIP = 16'h0001; PB = 3'h0;
         wait(SEVENSEGHEX == 32'h1);
         DIP = 16'h0; PB = 3'h1;
-        wait(LED_OUT);
+        wait(SEVENSEGHEX == 32'h0);
         DIP = 16'hFFFF; PB = 3'h0;
         wait(SEVENSEGHEX == 32'h0000FFFF);
         wait(LED_OUT == 0);
         
         // FFFF to 0001
         DIP = 16'h0; PB = 3'h2;
-        wait(SEVENSEGHEX == 32'h0);
+        wait(LED_OUT);
         DIP = 16'hFFFF; PB = 3'h0;
         wait(SEVENSEGHEX == 32'h0000FFFF);
         DIP = 16'h0; PB = 3'h1;
-        wait(LED_OUT);
+        wait(SEVENSEGHEX == 32'h0);
         DIP = 16'h0001; PB = 3'h0;
         wait(SEVENSEGHEX == 32'h1);
         wait(LED_OUT == 0);
         
         // Using shift
-        // FFFF from FFFF 
-        DIP = 16'h0; PB = 3'h2;
-        wait(SEVENSEGHEX == 32'h0);
-        DIP = 16'hFFFF; PB = 3'h0;
-        wait(SEVENSEGHEX == 32'h0000FFFF);
+        // FFFF to FFFF
         DIP = 16'h0; PB = 3'h2;
         wait(LED_OUT);
         DIP = 16'hFFFF; PB = 3'h0;
         wait(SEVENSEGHEX == 32'h0000FFFF);
-        wait(LED_OUT == 0);
-        
-        // 0001 from FFFF
         DIP = 16'h0; PB = 3'h2;
         wait(SEVENSEGHEX == 32'h0);
+        DIP = 16'hFFFF; PB = 3'h0;
+        wait(SEVENSEGHEX == 32'h0000FFFF);
+        wait(LED_OUT == 0);
+        
+        // 0001 to FFFF
+        DIP = 16'h0; PB = 3'h2;
+        wait(LED_OUT);
         DIP = 16'h0001; PB = 3'h0;
         wait(SEVENSEGHEX == 32'h1);
         DIP = 16'h0; PB = 3'h2;
-        wait(LED_OUT);
+        wait(SEVENSEGHEX == 32'h0);
         DIP = 16'hFFFF; PB = 3'h0;
         wait(SEVENSEGHEX == 32'h0000FFFF);
         wait(LED_OUT == 0);
         
-        // FFFF from 0001
-        DIP = 16'h0; PB = 3'h2; 
-        wait(SEVENSEGHEX == 32'h0);
+        // FFFF to 0001
+        DIP = 16'h0; PB = 3'h2;
+        wait(LED_OUT);
         DIP = 16'hFFFF; PB = 3'h0;
         wait(SEVENSEGHEX == 32'h0000FFFF);
         DIP = 16'h0; PB = 3'h2;
-        wait(LED_OUT);
+        wait(SEVENSEGHEX == 32'h0);
         DIP = 16'h0001; PB = 3'h0;
         wait(SEVENSEGHEX == 32'h1);
         wait(LED_OUT == 0);
         
         // Multiply + Divide
-        // FFFF from FFFF 
+        // FFFF to FFFF
         DIP = 16'h0; PB = 3'h2;
-        wait(SEVENSEGHEX == 32'h0);
+        wait(LED_OUT);
         DIP = 16'hFFFF; PB = 3'h0;
         wait(SEVENSEGHEX == 32'h0000FFFF);
         DIP = 16'h0; PB = 3'h4;
-        wait(LED_OUT);
+        wait(SEVENSEGHEX == 32'h0);
         DIP = 16'hFFFF; PB = 3'h0;
         wait(SEVENSEGHEX == 32'h0000FFFF);
         wait(LED_OUT == 0);
         
-        // 0001 from FFFF
+        // 0001 to FFFF
         DIP = 16'h0; PB = 3'h2;
-        wait(SEVENSEGHEX == 32'h0);
+        wait(LED_OUT);
         DIP = 16'h0001; PB = 3'h0;
         wait(SEVENSEGHEX == 32'h1);
         DIP = 16'h0; PB = 3'h4;
-        wait(LED_OUT);
+        wait(SEVENSEGHEX == 32'h0);
         DIP = 16'hFFFF; PB = 3'h0;
         wait(SEVENSEGHEX == 32'h0000FFFF);
         wait(LED_OUT == 0);
         
-        // FFFF from 0001
-        DIP = 16'h0; PB = 3'h2; 
-        wait(SEVENSEGHEX == 32'h0);
+        // FFFF to 0001
+        DIP = 16'h0; PB = 3'h2;
+        wait(LED_OUT);
         DIP = 16'hFFFF; PB = 3'h0;
         wait(SEVENSEGHEX == 32'h0000FFFF);
         DIP = 16'h0; PB = 3'h4;
-        wait(LED_OUT);
+        wait(SEVENSEGHEX == 32'h0);
         DIP = 16'h0001; PB = 3'h0;
         wait(SEVENSEGHEX == 32'h1);
         wait(LED_OUT == 0);
