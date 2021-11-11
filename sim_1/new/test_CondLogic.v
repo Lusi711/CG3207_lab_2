@@ -95,8 +95,7 @@ module test_CondLogic(
     end
     
     // GENERATE CLOCK       
-    always          
-    begin
+    always begin
        #5 CLK = ~CLK ; // invert clk every 5 time units 
     end
     

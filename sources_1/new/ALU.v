@@ -47,8 +47,9 @@ module ALU(
     
     assign S_wider = Src_A_comp + Src_B_comp + C_0 ;
     
-    always@(Src_A, Src_B, C_Flag, shifter_carry_out, ALUControl, S_wider) begin
-        // default values; help avoid latches
+    always@(Src_A, Src_B, C_Flag, shifter_carry_out, ALUControl, S_wider) 
+    begin 
+		// default values; help avoid latches
         C_0 <= 0 ; 
         Src_A_comp <= {1'b0, Src_A} ;
         Src_B_comp <= {1'b0, Src_B} ;

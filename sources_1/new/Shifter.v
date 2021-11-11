@@ -49,20 +49,20 @@ module Shifter(
     
     assign ShTemp0 = ShIn;
       
-    always@(ShOp, Sh, ShIn, Shamt5, ShOut, shifter_carry_out) begin
-        if (Shamt5 == 5'b0) begin
+    always@(ShOp, Sh, ShIn, Shamt5, ShOut, shifter_carry_out) 
+	begin
+        if (Shamt5 == 5'b0) 
             if (ShOp != 2'b01)
-                case(Sh)
+				case(Sh)
                     2'b01: shifter_carry_out <= ShIn[31] ;
                     2'b10: shifter_carry_out <= ShIn[31] ;
                     2'b11: shifter_carry_out <= ShIn[0] ;
                 endcase
-         end else begin
+        else
             case(Sh)
                 2'b00: shifter_carry_out <= ShIn[32 - Shamt5] ;
                 default: shifter_carry_out <= ShIn[Shamt5 - 1] ;
             endcase
-         end
 	end
 	
     shiftByNPowerOf2#(0) shiftBy0PowerOf2( Sh, Shamt5[0], ShTemp0, ShTemp1 ) ;

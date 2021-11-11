@@ -41,17 +41,18 @@ module test_MCycle(
     reg RESET = 0 ;
     reg Start = 0 ;
     reg [1:0] MCycleOp = 0 ;
-    reg [3:0] Operand1 = 0 ;
-    reg [3:0] Operand2 = 0 ;
+    reg [31:0] Operand1 = 0 ;
+    reg [31:0] Operand2 = 0 ;
 //    reg [31:0] Operand1 = 0 ;
 //    reg [31:0] Operand2 = 0 ;
 
     // DECLARE OUTPUT SIGNALs
-    wire [3:0] Result1 ;
-    wire [3:0] Result2 ;
+    wire [31:0] Result1 ;
+    wire [31:0] Result2 ;
 //    wire [31:0] Result1 ;
 //    wire [31:0] Result2 ;
     wire Busy ;
+    wire [3:0] ALUFlags;
     
     // INSTANTIATE DEVICE/UNIT UNDER TEST (DUT/UUT)
     MCycle dut( 
@@ -63,9 +64,10 @@ module test_MCycle(
         Operand2, 
         Result1, 
         Result2, 
-        Busy
+        Busy,
+        ALUFlags
         ) ;
-    
+    /*
     // 4 bit STIMULI
     initial begin
         // hold reset state for 100 ns.
@@ -253,8 +255,8 @@ module test_MCycle(
         Operand2 = 4'b0111 ;
         Start = 1'b1 ;
     end
-     
-  /*  // 32 bit STIMULI
+     */
+    // 32 bit STIMULI
     initial begin
         // hold reset state for 100 ns.
         // START OF SIGNED MUL
@@ -413,7 +415,7 @@ module test_MCycle(
         Operand1 = 32'h0 ;
         Operand2 = 32'hFFFFFFFF ;
         Start = 1'b1 ;
-    end */
+    end
     
     
     // GENERATE CLOCK       

@@ -93,6 +93,7 @@ module test_Wrapper #(
         wait(LED_OUT);
         wait(~LED_OUT);
         */
+        
         // FFFF to FFFF
         DIP = 16'h0; PB = 3'h2;
         wait(LED_OUT);
@@ -164,6 +165,7 @@ module test_Wrapper #(
         // FFFF to FFFF
         DIP = 16'h0; PB = 3'h2;
         wait(LED_OUT);
+        wait(SEVENSEGHEX == 32'h0);
         DIP = 16'hFFFF; PB = 3'h0;
         wait(SEVENSEGHEX == 32'h0000FFFF);
         DIP = 16'h0; PB = 3'h4;
